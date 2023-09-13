@@ -11,7 +11,7 @@ require_once HBM_PLUGIN_PATH . 'admin/users/class-hbm-user-meta-handler.php'; //
  * @subpackage admin
  */
 
-class HBM_Auth_Admin
+class HBM_Server_Auth_Admin
 {
     private $admin_options;
     private $user_meta_handler;
@@ -26,8 +26,7 @@ class HBM_Auth_Admin
     public function __construct()
     {
         if (is_admin()) {
-            $this->user_meta_handler = new HBM_User_Meta_Handler();
-            $this->admin_options = new HBM_Auth_Admin_Options();
+            $this->admin_options = new HBM_Server_Auth_Admin_Options();
             settings_errors('hbm-auth', false, true); // Display the error message in the admin panel
 
         }

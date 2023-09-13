@@ -1,19 +1,17 @@
 <?php
 
 include_once HBM_PLUGIN_PATH . 'admin/options/class-options-main.php'; // main options
-include_once HBM_PLUGIN_PATH . 'admin/options/class-options-test.php'; // Button to test the Entra configuration
-include_once HBM_PLUGIN_PATH . 'admin/options/class-options-layout.php'; // Layout options for the login logout flow
+include_once HBM_PLUGIN_PATH . 'admin/options/class-options-client-sites.php'; // Client sites options
 require_once HBM_PLUGIN_PATH . 'admin/options/helper-options.php'; // Logging functionality
 
-class HBM_Auth_Admin_options
+class HBM_Server_Auth_Admin_options
 {
 
     private $main_options;
     private $framework;
     private $framework_option;
     private $framework_label;
-    private $test_options;
-    private $layout_options;
+    private $client_sites;
     private $admin_clipboard = array();
     /**
      * Summary of __construct
@@ -44,8 +42,7 @@ class HBM_Auth_Admin_options
                 break;
         }
         $this->main_options = new HBM_Auth_Admin_Options_Main();
-        $this->test_options = new HBM_Auth_Admin_Options_Test();
-        $this->layout_options = new HBM_Auth_Admin_Layout();
+        $this->client_sites = new HBM_Auth_Admin_Options_Client_Sites();
         add_action('carbon_fields_register_fields', array($this, 'register_auth_options')); // Register the authentication options in the admin panel
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_options_assets')); // Enqueue the admin assets
         add_action('admin_notices', array($this, 'hbm_display_admin_notices')); // Display the admin notices (errors)
@@ -102,7 +99,7 @@ class HBM_Auth_Admin_options
     {
 
 
-        \Carbon_Fields\Container::make('theme_options', 'HBM Authentication')
+        \Carbon_Fields\Container::make('theme_options', 'HBM Auth Server')
             ->set_classes('hbm-admin')
             ->add_tab(
                 ('Main Options'), $this->main_options->displayFields()
@@ -111,11 +108,10 @@ class HBM_Auth_Admin_options
                 ("{$this->framework_label}"), $this->displayFields()
             )
             ->add_tab(
-                ('Test Configuration'), $this->test_options->displayFields()
-            )
-            ->add_tab(
-                ('Layout'), $this->layout_options->displayFields()
+                ("Client Sites"), $this->client_sites->displayFields()
             );
+
+        ;
     }
 
 }

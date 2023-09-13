@@ -2,7 +2,7 @@
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-class HBM_JWT_Manager
+class HBM_Server_JWT_Manager
 {
     private $secret_key_option_name = 'hbm_jwt_secret_key';
 

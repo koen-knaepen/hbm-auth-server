@@ -44,13 +44,6 @@ class HBM_Auth_Admin_Options_Main
         $framework_context = apply_filters('hbm_get_framework_context', '');
 
         $fields = array(
-            \Carbon_Fields\Field::make('text', 'hbm-auth-sso-server-url', 'Auth and SSO Server Domain') // Client ID
-                ->set_help_text('Enter the full url of the Wordpress that is used for Authentication and Single Sign On.')
-                ->set_attribute('placeholder', 'https://myssosite.com'),
-            \Carbon_Fields\Field::make('text', 'hbm-auth-subscription-client-id', 'Client ID') // Client ID
-                ->set_help_text('Enter the ID you received with the subscription email')
-                ->set_attribute('placeholder', 'Enter the Client ID')
-                ->set_required(true),
             \Carbon_Fields\Field::make('radio', 'hbm-auth-framework', 'Framework to use for authentication') // Field to select the authentication mode
                 ->add_options(
                     array(
@@ -67,22 +60,6 @@ class HBM_Auth_Admin_Options_Main
             \Carbon_Fields\Field::make('checkbox', 'hbm-auth-delete-fields-on-uninstall', 'Delete fields on plugin uninstallation?') // Field to delete the fields on plugin uninstallation in the database
                 ->set_help_text('If you want to keep the fields in the database after uninstallation of the plugin, uncheck this option.')
                 ->set_default_value('yes'),
-            \Carbon_Fields\Field::make('radio', 'hbm-auth-mode', 'Authentication Mode') // Field to select the authentication mode
-                ->add_options(
-                    array(
-                        'wp' => 'WP Auth only',
-                        // WP Auth only
-                        'entra' => 'entra Auth only',
-                        // Entra Auth only
-                        'both' => 'Both WP Auth and Entra Auth' // Both WP Auth and Entra Auth
-                    )
-                )
-                ->set_default_value('both')
-                ->set_classes('hbm-auth-horizontal-radio')
-                ->set_help_text('Select the authentication mode. If you select WP Auth only, the Entra Auth will be disabled. If you select Entra Auth only, the WP Auth will be disabled. If you select Both WP Auth and Entra Auth, both will be enabled.'),
-            // Set the default value to 'both'
-            \Carbon_Fields\Field::make('checkbox', 'hbm-auth-insert-user-on-login', 'Insert user on login') // Field to delete the fields on plugin uninstallation in the database
-                ->set_help_text('If you want to insert a not existing authenticated user on login, check this option. This useful if your users are already created in Entra and you want to create them in WP on login.'),
             \Carbon_Fields\Field::make('html', 'hbm-auth-redirect-url-display', 'Redirect URL') // Field to display the redirect URL
                 ->set_help_text("Copy this URL and paste it in the Redirect URL field in the application in {$framework_context->label} you want to use")
                 ->set_html('<div class="hbm-clipboard"><strong>Redirect URL:</strong> <span >' .

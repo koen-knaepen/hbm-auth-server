@@ -5,10 +5,9 @@ require_once HBM_PLUGIN_PATH . 'admin/class-hbm-auth-admin.php'; // Admin-relate
 require_once HBM_PLUGIN_PATH . 'api/class-hbm-api.php'; // API-related functionality
 require_once HBM_PLUGIN_PATH . 'public/class-hbm-sso-user.php'; // sso user class
 
-class HBM_Entra_Auth
+class HBM_Server_Auth
 {
     private $admin;
-    private $shortcodes;
     private $plugin_file;
     private $api;
     private $sso_user;
@@ -22,9 +21,8 @@ class HBM_Entra_Auth
             $this->sso_user = new HBM_SSO_User();
         }
         $this->plugin_file = $file;
-        $this->api = new HBM_API();
-        $this->admin = new HBM_Auth_Admin();
-        $this->shortcodes = new HBM_Shortcodes();
+        $this->api = new HBM_Server_API();
+        $this->admin = new HBM_Server_Auth_Admin();
 
     }
 

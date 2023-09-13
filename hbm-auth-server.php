@@ -44,5 +44,5 @@ function crb_load()
 }
 
 // Initialize the main plugin class
-$hbm_plugin = new HBM_Entra_Auth(HBM_PLUGIN_FILE);
-$hbm_plugin->run();
+$hbm_server_plugin = new HBM_Server_Auth(HBM_PLUGIN_FILE);
+$hbm_server_plugin->run();
