@@ -20,6 +20,9 @@ if (!defined('ABSPATH')) {
     die("You are not supposed to be here");
 }
 
+// Disable SSL verification for the API requests !!!! REMOVE THIS IN PRODUCTION !!!!
+add_filter('https_ssl_verify', '__return_false');
+
 
 // Define constants for plugin paths
 define('HBM_PLUGIN_PATH', plugin_dir_path(__FILE__));
@@ -32,8 +35,6 @@ define('HBM_PLUGIN_FILE', __FILE__);
 require_once HBM_PLUGIN_PATH . 'admin/log-script.php'; // Logging functionality
 require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth.php'; // Main plugin class
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-error_log('Loading hbm-auth plugin...');
 
 // Bootstrap Carbon Fields
 add_action('after_setup_theme', 'crb_load');

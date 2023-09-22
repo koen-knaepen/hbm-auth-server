@@ -140,5 +140,4 @@ class HBM_Framework_Cognito
       );
       return (object) $wp_user;
    }
-
 }

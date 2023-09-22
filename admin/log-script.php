@@ -10,37 +10,18 @@ if (!file_exists(HBM_PLUGIN_LOG_DIR)) {
     wp_mkdir_p(HBM_PLUGIN_LOG_DIR);
 }
 
-add_action('init', 'log_incoming_requests');
-
-function log_incoming_requests()
+function hbm_error_log($message)
 {
-    $log_file = HBM_PLUGIN_ACCESS_LOG; // Change this to a writable path on your server
-    $current_time = current_time('mysql');
-    $request_uri = $_SERVER['REQUEST_URI'];
-    $request_method = $_SERVER['REQUEST_METHOD'];
-    if (strpos($request_uri, 'hbm-entra-auth') !== false) {
-        // Get the request body
-        $request_body = file_get_contents('php://input');
-        $request_body_formatted = json_encode($request_body, JSON_PRETTY_PRINT);
-        $headers = getallheaders();
-        $headers_formatted = json_encode($headers, JSON_PRETTY_PRINT);
-        $log_entry = "{$current_time} - {$request_method} - {$request_uri} - Headers: {$headers_formatted} - Body: {$request_body_formatted}\n";
-    } else {
-        $log_entry = "{$current_time} - {$request_method} - {$request_uri}\n";
+    // Check if it's an AJAX request
+    if (defined('DOING_AJAX') && DOING_AJAX) {
+        // If it's a Heartbeat API request, return early without logging
+        if (isset($_POST['action']) && $_POST['action'] == 'heartbeat') {
+            return;
+        }
     }
-    file_put_contents($log_file, $log_entry, FILE_APPEND);
-}
 
-function hbm_log()
-{
-    $timestamp = date("Y-m-d") . " -> " . date("H:i:s") . " --> ";
-    $args = func_get_args();
-    $log = "";
-
-    foreach ($args as $arg) {
-        $log .= print_r($arg, true);
-    }
-    error_log($timestamp . $log . PHP_EOL, 3, HBM_PLUGIN_SERVER_LOG);
+    // If it's not a Heartbeat API request, log the message
+    error_log($message);
 }
 
 /**

@@ -64,7 +64,6 @@ class HBM_Server_Auth_Admin_options
                 'clearTransient' => 'clear_transient',
             )
         );
-
     }
 
 
@@ -102,16 +101,16 @@ class HBM_Server_Auth_Admin_options
         \Carbon_Fields\Container::make('theme_options', 'HBM Auth Server')
             ->set_classes('hbm-admin')
             ->add_tab(
-                ('Main Options'), $this->main_options->displayFields()
+                ('Main Options'),
+                $this->main_options->displayFields()
             )
             ->add_tab(
-                ("{$this->framework_label}"), $this->displayFields()
+                ("{$this->framework_label}"),
+                $this->displayFields()
             )
             ->add_tab(
-                ("Client Sites"), $this->client_sites->displayFields()
-            );
-
-        ;
+                ("Client Sites"),
+                $this->client_sites->displayFields()
+            );;
     }
-
 }

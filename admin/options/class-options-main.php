@@ -24,8 +24,6 @@ class HBM_Auth_Admin_Options_Main
                 'shouldConfirm' => $delete_option
             )
         );
-
-
     }
 
 
@@ -49,7 +47,7 @@ class HBM_Auth_Admin_Options_Main
                     array(
                         'cognito' => 'AWS Cognito',
                         'entra' => 'Microsoft Entra',
-                        'google' => 'Google Identity'
+                        // 'google' => 'Google Identity'
                     )
                 )
                 ->set_default_value('entra')
@@ -79,5 +77,4 @@ class HBM_Auth_Admin_Options_Main
         );
         return $fields;
     }
-
 }

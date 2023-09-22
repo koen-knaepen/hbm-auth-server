@@ -3,14 +3,6 @@
 require_once HBM_PLUGIN_PATH . 'api/class-hbm-encrypt.php'; // include an encryption management class
 require_once HBM_PLUGIN_PATH . 'api/class-hbm-callback-handler.php'; // include the callback handler class
 
-/**
- * 
- * 
- * 
- * 
- * 
- */
-
 class HBM_Server_API
 {
 
@@ -41,13 +33,22 @@ class HBM_Server_API
                 break;
             default:
                 error_log('No framework choosen');
+                add_filter("hbm_get_framework_context", array($this, 'get_framework_context'), 10, 1);
                 break;
         }
         $this->secret_manager = new HBM_Server_JWT_Manager();
 
         $this->callback_handler = new HBM_Callback_Handler($this->secret_manager);
-
     }
 
-
+    public function get_framework_context($default_value)
+    {
+        $context = array(
+            'name' => 'unknown',
+            'label' => 'NO FRAMEWORK',
+            'metadata' => "hbm_none_id",
+            'auth_id_name' => '',
+        );
+        return (object) $context;
+    }
 }
