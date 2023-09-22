@@ -33,7 +33,7 @@ require_once HBM_PLUGIN_PATH . 'admin/log-script.php'; // Logging functionality
 require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth.php'; // Main plugin class
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-hbm_log('Loading hbm-auth plugin...');
+error_log('Loading hbm-auth plugin...');
 
 // Bootstrap Carbon Fields
 add_action('after_setup_theme', 'crb_load');
@@ -45,4 +45,4 @@ function crb_load()
 
 // Initialize the main plugin class
 $hbm_server_plugin = new HBM_Server_Auth(HBM_PLUGIN_FILE);
-$hbm_server_plugin->run();
+// $hbm_server_plugin->run();

@@ -10,7 +10,7 @@ function hbm_plugin_deactivate()
 
     $delete_option = carbon_get_theme_option('hbm-auth-delete-fields-on-deactivate');
 
-    hbm_log('Deactivating hbm-entra-auth plugin...' . $delete_option);
+    error_log('Deactivating hbm-entra-auth plugin... and cleaning the database' . $delete_option);
 
     if ($delete_option) {
         hbm_log('cleaning up the database for hbm-entra-auth plugin');
