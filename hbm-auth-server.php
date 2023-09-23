@@ -21,8 +21,8 @@ if (!defined('ABSPATH')) {
 }
 
 // Disable SSL verification for the API requests !!!! REMOVE THIS IN PRODUCTION !!!!
-add_filter('https_ssl_verify', '__return_false');
-
+// add_filter('https_ssl_verify', '__return_false');
+// add_filter('https_local_ssl_verify', '__return_false');
 
 // Define constants for plugin paths
 define('HBM_PLUGIN_PATH', plugin_dir_path(__FILE__));
