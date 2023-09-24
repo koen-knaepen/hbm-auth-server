@@ -59,12 +59,18 @@
     border: 1px solid #49c0de !important;
 }
 
-[data-slug="pods"].active .deactivate {
+[data-slug="pods"].active .deactivate,
+[data-slug="pods"].active input[type="checkbox"] {
     display: none !important;
 }
 
+[data-slug="pods"].active .plugin-title {
+    max-width: 20vw !important;
+    text-wrap: pretty;
+}
+
 [data-slug="pods"].active .plugin-title::after {
-    content: "Pods is required for HBM Auth Server. Deactivate HBM Auth Server first.";
+    content: "Pods is required for HBM Auth Server. To deactivate or delete, deactivate HBM Auth Server first.";
     color: red !important;
     font-weight: bold;
     padding: 3px 0px;

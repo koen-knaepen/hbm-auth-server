@@ -47,6 +47,7 @@ class HBM_Auth_Activate
     {
         // add_action('init', array($this, 'hbm_user_capability'));
         register_activation_hook(HBM_PLUGIN_FILE, array($this, 'hbm_plugin_activate'));
+        add_action('activated_plugin', array($this, 'hbm_after_activation_configure_pods'), 10, 1);
     }
 
     public function hbm_plugin_activate()
@@ -80,6 +81,7 @@ class HBM_Auth_Activate
                     return;
                 }
             }
+            error_log('PODS plugin activated successfully.');
         } catch (Exception $e) {
             error_log('Error activating PODS plugin: ' . $e->getMessage());
         } catch (Error $e) {
@@ -116,6 +118,31 @@ class HBM_Auth_Activate
     {
         if (!current_user_can('activate_plugins')) {
             exit('You do not have permission to activate plugins.');
+        }
+    }
+
+    function hbm_after_activation_configure_pods($plugin)
+    {
+        $original_plugin_path = 'hbm-auth-server/hbm-auth-server.php';
+        if ($plugin == $original_plugin_path) {
+            $pods_components_class = pods_components();
+            $migrate_active = $pods_components_class->is_component_active('migrate-packages');
+            if (!$migrate_active) {
+                $pods_components_class->activate_component('migrate-packages');
+            }
+            $json_data = file_get_contents(HBM_PLUGIN_PATH . 'pods-packages\pods-init-package.json');
+            error_log('json data in file: ');
+            $pods_migrate_class = pods_migrate();
+            $parsed_pod_items = $pods_migrate_class->parse_json($json_data);
+            error_log('parsed pod items: ' . print_r($parsed_pod_items['items']['pods'], true));
+            $pods_api = pods_api();
+            foreach ($parsed_pod_items['items'] as $pod_item) {
+                $pods_api->save_pod($pod_item);
+            }
+            if (!$migrate_active) {
+                $pods_components_class->deactivate_component('migrate-packages');
+            }
+            error_log('HBM Auth plugin activated');
         }
     }
 }
