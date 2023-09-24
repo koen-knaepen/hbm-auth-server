@@ -52,3 +52,42 @@
 .hbm-input-readonly input {
     border: none !important;
 }
+
+[data-slug="hbm-auth-server"] .plugin-title,
+[data-slug="pods"] .plugin-title {
+    color: red !important;
+    border: 1px solid #49c0de !important;
+}
+
+[data-slug="pods"].active .deactivate {
+    display: none !important;
+}
+
+[data-slug="pods"].active .plugin-title::after {
+    content: "Pods is required for HBM Auth Server. Deactivate HBM Auth Server first.";
+    color: red !important;
+    font-weight: bold;
+    padding: 3px 0px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 3px;
+}
+
+[data-slug="pods"].inactive .plugin-description::after {
+    content: "Pods is required for HBM Auth Server to work properly.";
+    color: red !important;
+    font-weight: bold;
+    padding: 3px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 3px;
+}
+
+[data-slug="hbm-auth-server"] .plugin-description {
+    background-color: #dda14a !important;
+    padding: 3px;
+}
+
+[data-slug="hbm-auth-server"] .plugin-description p {
+    color: #ffffff !important;
+}

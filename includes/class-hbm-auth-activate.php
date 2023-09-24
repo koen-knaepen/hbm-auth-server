@@ -10,6 +10,37 @@ include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 include_once ABSPATH . 'wp-admin/includes/file.php';
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
+/* 
+* This class is used to install and activate the PODS plugin
+* when the HBM Auth plugin is activated.
+* @since 1.0.0
+* @package HBM_Auth
+* @class HBM_Auth_Activate
+*/
+class Silent_Installer_Skin extends Plugin_Installer_Skin
+{
+
+    public function header()
+    {
+        // echo "Starting the plugin installation process...";
+        // echo "The plugin installation process may take a few minutes...";
+        // echo "We'll install also the free plugin PODS, which is required for this plugin to work.";
+        // echo "Make sure you are connected to the internet.";
+    }
+    public function footer()
+    {
+    }
+    public function feedback($string, ...$args)
+    {
+        error_log('Feedback: ' . $string);
+    }
+    public function error($errors)
+    {
+        error_log('Error: ' . json_encode($errors, JSON_PRETTY_PRINT));
+    }
+}
+
+
 class HBM_Auth_Activate
 {
     public function __construct()
@@ -67,10 +98,8 @@ class HBM_Auth_Activate
         }
 
         try {
-            $upgrader = new Plugin_Upgrader(new Plugin_installer_Skin());
+            $upgrader = new Plugin_Upgrader(new Silent_Installer_Skin());
             $installed = $upgrader->install($plugin_zip_url);
-            error_log('Before activating HBM plugin ...');
-            if ($test) return 'test';
         } catch (Exception $e) {
             error_log('Error installing PODS plugin with Plugin_Upgrader: ' . $e->getMessage());
         } catch (Error $e) {
@@ -81,27 +110,6 @@ class HBM_Auth_Activate
         } else {
             return 'Plugin installation failed.';
         }
-    }
-
-    function download_and_install_pods_plugin()
-    {
-        $plugin_zip_url = 'https://downloads.wordpress.org/plugin/pods.latest-stable.zip';
-        $tmp_file = download_url($plugin_zip_url);
-
-        if (is_wp_error($tmp_file)) {
-            error_log('Error downloading PODS plugin: ' . $tmp_file->get_error_message());
-            return 'Plugin installation failed.';
-        }
-
-        $plugin_directory = WP_PLUGIN_DIR . '/pods';
-        $result = unzip_file($tmp_file, $plugin_directory);
-
-        if (is_wp_error($result)) {
-            error_log('Error unzipping PODS plugin: ' . $result->get_error_message());
-            return 'Plugin installation failed.';
-        }
-
-        return 'Plugin installed successfully.';
     }
 
     public function hbm_user_capability()

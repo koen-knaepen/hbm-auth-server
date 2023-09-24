@@ -2,7 +2,7 @@
 /*
  * Plugin Name:       HBM Auth Server
  * Plugin URI:        https://hackbizmodels.academy
- * Description:       Handle the basics with this plugin.
+ * Description:       HBM Auth Server transforms your Wordpress Install into a Single Sign-On Server with the help of AWS Cognito or MS Entra.<br> The free PODS plugin is required and will be installed or activated on activation of this plugin. Make sure you are connected to the internet.
  * Version:           1.10.3
  * Requires at least: 5.2
  * Requires PHP:      7.2
