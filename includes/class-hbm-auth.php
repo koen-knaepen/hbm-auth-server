@@ -51,12 +51,10 @@ class HBM_Server_Auth
         }
         $this->plugin_file = $file;
         if (is_admin()) {
-            hbm_error_log('Loading hbm-auth plugin for admin...');
             $this->admin = new HBM_Server_Auth_Admin();
             $this->activate = new HBM_Auth_Activate();
             $this->deactivate = new HBM_Auth_Deactivate();
         } else {
-            hbm_error_log('Loading hbm-auth plugin for public...');
         }
         $this->api = new HBM_Server_API();
     }

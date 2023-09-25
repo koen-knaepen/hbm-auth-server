@@ -60,9 +60,52 @@
 }
 
 [data-slug="pods"].active .deactivate,
-[data-slug="pods"].active input[type="checkbox"] {
+[data-slug="pods"].active input[type="checkbox"],
+.pods-ui-css-value-hbm-applications .row-actions,
+.pods-ui-css-value-hbm-sites .row-actions,
+.pods-ui-css-value-hbm-auth-server .row-actions {
     display: none !important;
 }
+
+.pods-admin__content-container [name="pods_reset"],
+.pods-admin__content-container [name="pods_reset_deactivate"] {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+
+}
+
+.pods-ui-css-value-hbm-applications .row-title,
+.pods-ui-css-value-hbm-sites .row-title,
+.pods-ui-css-value-hbm-auth-server .row-title {
+    pointer-events: none;
+    color: #dda14a;
+    cursor: not-allowed;
+
+}
+
+.pods-ui-css-value-hbm-applications .row-title::after,
+.pods-ui-css-value-hbm-sites .row-title::after,
+.pods-ui-css-value-hbm-auth-server .row-title::after {
+    content: "Not Editable - HBM Auth";
+    color: red !important;
+    font-weight: bold;
+    padding: 0px 0px 3px 0px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 3px;
+}
+
+.hbm-disable-wrapper::after {
+    content: "Pods is required for HBM Auth Server to work properly. To reset first deactivate HBM Auth Server.";
+    color: red !important;
+    font-weight: bold;
+    padding: 3px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 3px;
+}
+
 
 [data-slug="pods"].active .plugin-title {
     max-width: 20vw !important;
@@ -78,6 +121,7 @@
     margin-top: 5px;
     border-radius: 3px;
 }
+
 
 [data-slug="pods"].inactive .plugin-description::after {
     content: "Pods is required for HBM Auth Server to work properly.";

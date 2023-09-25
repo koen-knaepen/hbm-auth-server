@@ -32,4 +32,13 @@ jQuery(document).ready(function ($) {
       $notification.remove();
     }, 2000);
   });
+  // Disable the reset button in PODS admin for as long the HBM plugin(s) are running
+  var $inputButtons = $(
+    '.pods-admin__content-container [name="pods_reset"],.pods-admin__content-container [name="pods_reset_deactivate"]'
+  );
+
+  // Wrap the input button with a div
+  $inputButtons.each(function () {
+    $(this).wrap('<div class="hbm-disable-wrapper"></div>');
+  });
 });

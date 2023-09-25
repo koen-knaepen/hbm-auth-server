@@ -73,5 +73,5 @@ function test_all_hooks_of_plugin()
     // error_log('pods migrate methods' . print_r($pods_migrate_methods, true));
 }
 
-add_action('plugins_loaded', 'test_all_hooks_of_plugin');
+// add_action('plugins_loaded', 'test_all_hooks_of_plugin');
 // $hbm_server_plugin->run();

@@ -32,7 +32,6 @@ class Silent_Installer_Skin extends Plugin_Installer_Skin
     }
     public function feedback($string, ...$args)
     {
-        error_log('Feedback: ' . $string);
     }
     public function error($errors)
     {
@@ -45,9 +44,10 @@ class HBM_Auth_Activate
 {
     public function __construct()
     {
-        // add_action('init', array($this, 'hbm_user_capability'));
         register_activation_hook(HBM_PLUGIN_FILE, array($this, 'hbm_plugin_activate'));
-        add_action('activated_plugin', array($this, 'hbm_after_activation_configure_pods'), 10, 1);
+        add_action('activated_plugin', array($this, 'hbm_on_plugin_activation'), 10, 1);
+        add_action('admin_init', array($this, 'hbm_check_pods_import_activation'));
+        add_action('admin_init', array($this, 'hbm_intialize_pods_packages'));
     }
 
     public function hbm_plugin_activate()
@@ -69,7 +69,6 @@ class HBM_Auth_Activate
                 }
             } else {
                 $install_result = $this->install_pods_plugin();
-                error_log('Install result: ' . $install_result);
                 if ($install_result === 'Plugin installed successfully.') {
                     $result = activate_plugin($plugin_path);
                     if (is_wp_error($result)) {
@@ -81,7 +80,6 @@ class HBM_Auth_Activate
                     return;
                 }
             }
-            error_log('PODS plugin activated successfully.');
         } catch (Exception $e) {
             error_log('Error activating PODS plugin: ' . $e->getMessage());
         } catch (Error $e) {
@@ -114,35 +112,63 @@ class HBM_Auth_Activate
         }
     }
 
-    public function hbm_user_capability()
+    function hbm_on_plugin_activation($plugin)
     {
-        if (!current_user_can('activate_plugins')) {
-            exit('You do not have permission to activate plugins.');
+        $original_plugin = 'hbm-auth-server/hbm-auth-server.php';
+        if ($plugin == $original_plugin) {
+            $pods_components_class = pods_components();
+            $migrate_active = $pods_components_class->is_component_active('migrate-packages');
+            if ($migrate_active) {
+                set_transient('hbm_pods_import_package', 'enabled', 60);
+            } else {
+                set_transient('hbm_pods_migrate_activation', true, 60);
+            }
+        }
+    }
+    function hbm_check_pods_import_activation()
+    {
+        if (get_transient('hbm_pods_migrate_activation')) {
+            $installed_components = array();
+            $pods_components_class = pods_components();
+            $pods_components = $pods_components_class->get_components();
+            foreach ($pods_components as $component) {
+                if ($pods_components_class->is_component_active($component['ID'])) {
+                    $installed_components[] = $component['ID'];
+                }
+            }
+            $pods_components_class->activate_component('migrate-packages');
+            set_transient('hbm_pods_import_package', $installed_components, 60);
+            delete_transient('hbm_pods_migrate_activation');
+            wp_redirect($_SERVER['REQUEST_URI']);
+            exit;
         }
     }
 
-    function hbm_after_activation_configure_pods($plugin)
+
+    function hbm_intialize_pods_packages()
     {
-        $original_plugin_path = 'hbm-auth-server/hbm-auth-server.php';
-        if ($plugin == $original_plugin_path) {
-            $pods_components_class = pods_components();
-            $migrate_active = $pods_components_class->is_component_active('migrate-packages');
-            if (!$migrate_active) {
-                $pods_components_class->activate_component('migrate-packages');
-            }
-            $json_data = file_get_contents(HBM_PLUGIN_PATH . 'pods-packages\pods-init-package.json');
-            error_log('json data in file: ');
-            $pods_migrate_class = pods_migrate();
-            $parsed_pod_items = $pods_migrate_class->parse_json($json_data);
-            error_log('parsed pod items: ' . print_r($parsed_pod_items['items']['pods'], true));
+        $installed_components = get_transient('hbm_pods_import_package');
+        if ($installed_components !== false) {
+            $pods_slug = HBM_PLUGIN_PATH . 'pods-packages/pods-init-package.json';
+            $json_data = file_get_contents($pods_slug);
             $pods_api = pods_api();
-            foreach ($parsed_pod_items['items'] as $pod_item) {
-                $pods_api->save_pod($pod_item);
+            if (!pods("hbm-auth")) {
+                $package_result = $pods_api->import_package($json_data, false);
             }
-            if (!$migrate_active) {
-                $pods_components_class->deactivate_component('migrate-packages');
+            if ($installed_components != 'enabled') {
+                $pods_components_class = pods_components();
+                $current_components = $pods_components_class->get_components();
+                foreach ($current_components as $component) {
+                    if (in_array($component['ID'], $installed_components)) {
+                        $pods_components_class->activate_component($component['ID']);
+                    } else {
+                        $pods_components_class->deactivate_component($component['ID']);
+                    }
+                }
             }
-            error_log('HBM Auth plugin activated');
+            delete_transient('hbm_pods_import_package');
+            wp_redirect($_SERVER['REQUEST_URI']);
+            exit;
         }
     }
 }
