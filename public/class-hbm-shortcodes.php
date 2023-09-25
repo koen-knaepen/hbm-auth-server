@@ -9,7 +9,7 @@ class HBM_Shortcodes
     {
         // Register the shortcode when the class is instantiated.
         add_shortcode('hbm_login_button', array($this, 'render_login_button'));
-        // add_action('init', array($this, 'hbm_set_page_uuid'));
+        add_shortcode('hbm_site_url', array($this, 'shortcode_site_url'));
     }
 
 
@@ -59,21 +59,8 @@ class HBM_Shortcodes
         }
     }
 
-    // maybe usefull for later
-    // public function hbm_set_page_uuid()
-    // {
-    //     static $page_if_set = false;
-    //     if ($_SERVER['REQUEST_URI'] !== '/' || $page_if_set) {
-    //         return;
-    //     } else {
-    //         $this->active_page = uniqid('hbm-auth-page-');
-    //         session_start();
-    //         $_SESSION['hbm_auth_page'] = $this->active_page;
-    //         setcookie('hbm_auth_page', $this->active_page, 0, '/');
-    //         error_log("hbm_auth_page SESSION: " . json_encode($_SESSION, JSON_PRETTY_PRINT));
-    //         $page_if_set = true;
-    //         return;
-    //     }
-    // }
-
+    function shortcode_site_url()
+    {
+        return get_site_url();
+    }
 }
