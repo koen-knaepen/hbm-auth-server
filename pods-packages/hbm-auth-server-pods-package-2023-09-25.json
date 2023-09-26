@@ -1,12 +1,12 @@
 {
     "@meta": {
         "version": "3.0.4",
-        "build": 1695665333
+        "build": 1695732992
     },
     "pods": [
         {
             "name": "hbm-application",
-            "id": 700,
+            "id": 91,
             "label": "HBM Applications",
             "description": "",
             "type": "pod",
@@ -43,7 +43,7 @@
             "groups": [
                 {
                     "name": "setting",
-                    "id": 701,
+                    "id": 92,
                     "label": "Settings",
                     "description": "",
                     "weight": 0,
@@ -52,7 +52,7 @@
                     "fields": [
                         {
                             "name": "name",
-                            "id": 704,
+                            "id": 95,
                             "label": "Name",
                             "description": "",
                             "weight": 0,
@@ -82,7 +82,7 @@
                         },
                         {
                             "name": "created",
-                            "id": 705,
+                            "id": 96,
                             "label": "Date Created",
                             "description": "",
                             "weight": 1,
@@ -93,7 +93,7 @@
                         },
                         {
                             "name": "modified",
-                            "id": 706,
+                            "id": 97,
                             "label": "Date Modified",
                             "description": "",
                             "weight": 2,
@@ -101,40 +101,12 @@
                             "datetime_format": "ymd_slash",
                             "datetime_time_type": "12",
                             "datetime_time_format": "h_mm_ss_A"
-                        },
-                        {
-                            "name": "entra_tenant_id",
-                            "id": 712,
-                            "label": "Tenant ID",
-                            "description": "Give the name of the Tenant in Entra you want to use",
-                            "weight": 3,
-                            "type": "text",
-                            "sister_id": "-- Select One --",
-                            "required": "0",
-                            "unique": "0",
-                            "text_allowed_html_tags": "strong em a ul ol li b i",
-                            "text_max_length": "255",
-                            "repeatable": "0",
-                            "repeatable_format": "default",
-                            "roles_allowed": "administrator",
-                            "enable_conditional_logic": "1",
-                            "conditional_logic": {
-                                "action": "show",
-                                "logic": "any",
-                                "rules": [
-                                    {
-                                        "field": "hbm_auth_app_framework",
-                                        "compare": "=",
-                                        "value": "entra"
-                                    }
-                                ]
-                            }
                         }
                     ]
                 },
                 {
                     "name": "client_sites",
-                    "id": 702,
+                    "id": 93,
                     "label": "Client Sites",
                     "description": "",
                     "weight": 1,
@@ -143,7 +115,7 @@
                     "fields": [
                         {
                             "name": "registered_client_sites",
-                            "id": 707,
+                            "id": 99,
                             "label": "Registered Client Sites",
                             "description": "All sites (domains) that can use this application for user management",
                             "weight": 0,
@@ -178,7 +150,7 @@
                 },
                 {
                     "name": "hbm_auth_settings",
-                    "id": 703,
+                    "id": 94,
                     "label": "Framework Settings",
                     "description": "",
                     "weight": 2,
@@ -187,7 +159,7 @@
                     "fields": [
                         {
                             "name": "app_framework",
-                            "id": 708,
+                            "id": 100,
                             "label": "Framework",
                             "description": "Indicate what the framework for authentication and SSO is you want to use.",
                             "weight": 0,
@@ -221,7 +193,7 @@
                         },
                         {
                             "name": "cognito_userpool",
-                            "id": 709,
+                            "id": 101,
                             "label": "Cognito Userpool",
                             "description": "Give the subdomain (first part) of the Cognito User Pool you want to use",
                             "weight": 1,
@@ -250,7 +222,7 @@
                         },
                         {
                             "name": "cognito_aws_regio",
-                            "id": 710,
+                            "id": 102,
                             "label": "AWS Regio",
                             "description": "Give the technical name of the AWS regio where the User Pool is hosted",
                             "weight": 2,
@@ -279,7 +251,7 @@
                         },
                         {
                             "name": "entra_tenant_name",
-                            "id": 711,
+                            "id": 103,
                             "label": "Tenant Name",
                             "description": "Give the name of the Tenant in Entra you want to use",
                             "weight": 3,
@@ -307,7 +279,7 @@
                         },
                         {
                             "name": "framework_client_id",
-                            "id": 713,
+                            "id": 104,
                             "label": "Application (Client) ID",
                             "description": "Give your client ID from the application in Cognito you want to use",
                             "weight": 4,
@@ -335,7 +307,7 @@
                         },
                         {
                             "name": "framework_client_secret",
-                            "id": 714,
+                            "id": 105,
                             "label": "Client Secret",
                             "description": "Copy the secret you want to use from the application in cognito and paste it here",
                             "weight": 5,
@@ -351,7 +323,7 @@
                         },
                         {
                             "name": "entra_signup_policy",
-                            "id": 715,
+                            "id": 106,
                             "label": "Signup Policy",
                             "description": "Give the name of the policy in Entra you want to use to sign up",
                             "weight": 6,
@@ -379,7 +351,7 @@
                         },
                         {
                             "name": "entra_login_policy",
-                            "id": 716,
+                            "id": 107,
                             "label": "Login Policy",
                             "description": "Give the name of the policy in Entra you want to use to login",
                             "weight": 7,
@@ -407,7 +379,7 @@
                         },
                         {
                             "name": "entra_editprofile_policy",
-                            "id": 717,
+                            "id": 108,
                             "label": "Edit Profile Policy",
                             "description": "Give the name of the policy in Entra you want to use to edit the profile",
                             "weight": 8,
@@ -439,7 +411,7 @@
         },
         {
             "name": "hbm-auth",
-            "id": 718,
+            "id": 109,
             "label": "HBM Auth Server",
             "description": "",
             "type": "settings",
@@ -457,14 +429,14 @@
             "groups": [
                 {
                     "name": "details",
-                    "id": 719,
+                    "id": 110,
                     "label": "Details",
                     "description": "",
                     "weight": 0,
                     "fields": [
                         {
                             "name": "hbm_auth_sso_configuration",
-                            "id": 720,
+                            "id": 111,
                             "label": "SSO Configuration",
                             "description": "",
                             "weight": 0,
@@ -480,19 +452,58 @@
                         },
                         {
                             "name": "hbm_auth_redirect_url",
-                            "id": 721,
+                            "id": 112,
                             "label": "Redirect URL",
-                            "description": "This is the redirect url used to login and signup or change profile",
+                            "description": "This is the redirect url used to login and signup or change profile with the framework.",
                             "weight": 1,
                             "type": "html",
-                            "sister_id": "-- Select One --",
+                            "sister_id": "36",
                             "required": "0",
                             "html_no_label": "0",
                             "repeatable": "0",
                             "repeatable_format": "default",
                             "roles_allowed": "administrator",
                             "enable_conditional_logic": "0",
-                            "html_content": "<?php echo site_url() . '\/wp-json\/hbm-auth\/callback'; ",
+                            "html_content": "[hbm_copy_wrapper][hbm_callback_url][\/hbm_copy_wrapper]",
+                            "html_trim": "1",
+                            "html_oembed": "1",
+                            "html_wptexturize": "1",
+                            "html_convert_chars": "1",
+                            "html_wpautop": "1",
+                            "html_allow_shortcode": "1"
+                        },
+                        {
+                            "name": "hbm_logout_url",
+                            "id": 113,
+                            "label": "Logout URL",
+                            "description": "This is the logout url used to logout users explicitely by the framework.",
+                            "weight": 2,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "html_content": "[hbm_copy_wrapper][hbm_callback_url slug=\"logout\"][\/hbm_copy_wrapper]",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "html_allow_shortcode": "1"
+                        },
+                        {
+                            "name": "hbm_auth_sso",
+                            "id": 114,
+                            "label": "SSO Server URL",
+                            "description": "Copy this url in the client site to redirect back to this server after login, signup or change profile.",
+                            "weight": 3,
+                            "type": "html",
+                            "sister_id": "36",
+                            "required": "0",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "html_content": "[hbm_copy_wrapper][hbm_callback_url slug=\"sso\"][\/hbm_copy_wrapper]",
                             "html_trim": "1",
                             "html_oembed": "1",
                             "html_wptexturize": "1",
@@ -502,10 +513,10 @@
                         },
                         {
                             "name": "hbm_auth_sso_plugin_management",
-                            "id": 722,
+                            "id": 115,
                             "label": "Plugin Management",
                             "description": "",
-                            "weight": 2,
+                            "weight": 4,
                             "type": "heading",
                             "sister_id": "-- Select One --",
                             "required": "0",
@@ -518,10 +529,10 @@
                         },
                         {
                             "name": "hbm_auth_on_plugin_deactivation",
-                            "id": 723,
+                            "id": 116,
                             "label": "On plugin deactivation",
                             "description": "Delete database and fields upon deactivation?",
-                            "weight": 3,
+                            "weight": 5,
                             "type": "pick",
                             "pick_object": "custom-simple",
                             "sister_id": "-- Select One --",
@@ -549,10 +560,10 @@
                         },
                         {
                             "name": "hbm_auth_on_plugin_delete",
-                            "id": 724,
+                            "id": 117,
                             "label": "On plugin removal",
                             "description": "Remove Database and fields upon plugin deletion",
-                            "weight": 4,
+                            "weight": 6,
                             "type": "pick",
                             "pick_object": "custom-simple",
                             "sister_id": "-- Select One --",
@@ -585,7 +596,7 @@
         },
         {
             "name": "hbm-site",
-            "id": 725,
+            "id": 118,
             "label": "HBM Sites",
             "description": "",
             "type": "pod",
@@ -622,14 +633,14 @@
             "groups": [
                 {
                     "name": "details",
-                    "id": 726,
+                    "id": 119,
                     "label": "Details",
                     "description": "",
                     "weight": 0,
                     "fields": [
                         {
                             "name": "name",
-                            "id": 727,
+                            "id": 120,
                             "label": "Site",
                             "description": "",
                             "weight": 0,
@@ -662,7 +673,7 @@
                         },
                         {
                             "name": "created",
-                            "id": 728,
+                            "id": 121,
                             "label": "Date Created",
                             "description": "",
                             "weight": 1,
@@ -673,7 +684,7 @@
                         },
                         {
                             "name": "modified",
-                            "id": 729,
+                            "id": 122,
                             "label": "Date Modified",
                             "description": "",
                             "weight": 2,
@@ -684,14 +695,14 @@
                         },
                         {
                             "name": "application",
-                            "id": 730,
+                            "id": 123,
                             "label": "Application",
                             "description": "",
                             "weight": 3,
                             "type": "pick",
                             "pick_object": "pod",
                             "pick_val": "hbm-application",
-                            "sister_id": "27",
+                            "sister_id": "38",
                             "pick_table": "-- Select One --",
                             "required": "0",
                             "unique": "0",

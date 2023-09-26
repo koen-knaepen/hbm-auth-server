@@ -155,9 +155,15 @@ class HBM_Auth_Activate
             error_log('pods slug: ' . $pods_slug);
             $json_data = file_get_contents($pods_slug);
             $pods_api = pods_api();
-            if (!pods('hbm-auth')) {
-                $package_result = $pods_api->import_package($json_data, true);
+            // if (!pods('hbm-auth')) {
+            try {
+                $package_result = $pods_api->import_package($json_data, false);
+            } catch (Exception $e) {
+                error_log('Error importing PODS package: ' . print_r($e->getMessage(), true));
+            } catch (Error $e) {
+                error_log('Error importing PODS package: ' . print_r($e->getMessage(), true));
             }
+            // }
             if ($installed_components != 'enabled') {
                 $pods_components_class = pods_components();
                 $current_components = $pods_components_class->get_components();
