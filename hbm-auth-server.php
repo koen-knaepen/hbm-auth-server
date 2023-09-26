@@ -28,6 +28,7 @@ if (!defined('ABSPATH')) {
 define('HBM_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('HBM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('HBM_PLUGIN_FILE', __FILE__);
+define('HBM_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 
 

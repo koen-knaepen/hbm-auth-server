@@ -9,7 +9,6 @@ class HBM_Shortcodes
     {
         // Register the shortcode when the class is instantiated.
         add_shortcode('hbm_login_button', array($this, 'render_login_button'));
-        add_shortcode('hbm_site_url', array($this, 'shortcode_site_url'));
     }
 
 
@@ -57,10 +56,5 @@ class HBM_Shortcodes
                 . " data-hbm-auth='{\"mode\":\"live\", \"action\":\"login\" , \"display_login\" : \"{$display_login}\" , \"display_logout\" : \"{$display_logout}\"}'>"
                 . esc_html($button_login_text) . '</button>';
         }
-    }
-
-    function shortcode_site_url()
-    {
-        return get_site_url();
     }
 }

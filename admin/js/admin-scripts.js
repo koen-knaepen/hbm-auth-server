@@ -1,6 +1,8 @@
 jQuery(document).ready(function ($) {
   // Attach a click listener to all buttons with class "hbm-copy-clipboard" within a div with class "hbm-clipboard"
   $(".hbm-clipboard .hbm-copy-clipboard").on("click", function () {
+    event.preventDefault();
+    event.stopPropagation();
     // Find the span within the clicked div and get its text content
     var copyText = $(this).closest(".hbm-clipboard").find("span").text();
 

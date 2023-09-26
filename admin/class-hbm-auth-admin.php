@@ -1,7 +1,7 @@
 <?php
 
 require_once HBM_PLUGIN_PATH . 'admin/options/class-options.php'; // Admin-related functionality
-require_once HBM_PLUGIN_PATH . 'admin/users/class-hbm-user-meta-handler.php'; // User-related functionality
+require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
 
 
 /**
@@ -14,8 +14,7 @@ require_once HBM_PLUGIN_PATH . 'admin/users/class-hbm-user-meta-handler.php'; //
 class HBM_Server_Auth_Admin
 {
     private $admin_options;
-    private $user_meta_handler;
-    public $options_updated = false;
+    private $admin_shortcodes;
 
     /**
      * Summary of __construct
@@ -27,6 +26,7 @@ class HBM_Server_Auth_Admin
     {
         if (is_admin()) {
             $this->admin_options = new HBM_Server_Auth_Admin_Options();
+            $this->admin_shortcodes = new HBM_Server_Auth_Admin_Shortcodes();
             settings_errors('hbm-auth', false, true); // Display the error message in the admin panel
             add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
         }

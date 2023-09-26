@@ -89,7 +89,6 @@ class HBM_Auth_Activate
 
     function install_pods_plugin()
     {
-        $test = true;
         $plugin_zip_url = 'https://downloads.wordpress.org/plugin/pods.latest-stable.zip';
         $plugin_directory = WP_PLUGIN_DIR . '/pods';
 
@@ -114,8 +113,7 @@ class HBM_Auth_Activate
 
     function hbm_on_plugin_activation($plugin)
     {
-        $original_plugin = 'hbm-auth-server/hbm-auth-server.php';
-        if ($plugin == $original_plugin) {
+        if ($plugin == HBM_PLUGIN_BASENAME) {
             $pods_components_class = pods_components();
             $migrate_active = $pods_components_class->is_component_active('migrate-packages');
             if ($migrate_active) {
@@ -149,11 +147,16 @@ class HBM_Auth_Activate
     {
         $installed_components = get_transient('hbm_pods_import_package');
         if ($installed_components !== false) {
-            $pods_slug = HBM_PLUGIN_PATH . 'pods-packages/pods-init-package.json';
+            $pods_slug = $this->get_latest_hbm_package(HBM_PLUGIN_PATH . 'pods-packages', 'hbm-auth-server-pods-package');
+            if ($pods_slug === false) {
+                delete_transient('hbm_pods_import_package');
+                throw new Exception('No PODS package found.');
+            }
+            error_log('pods slug: ' . $pods_slug);
             $json_data = file_get_contents($pods_slug);
             $pods_api = pods_api();
-            if (!pods("hbm-auth")) {
-                $package_result = $pods_api->import_package($json_data, false);
+            if (!pods('hbm-auth')) {
+                $package_result = $pods_api->import_package($json_data, true);
             }
             if ($installed_components != 'enabled') {
                 $pods_components_class = pods_components();
@@ -170,5 +173,31 @@ class HBM_Auth_Activate
             wp_redirect($_SERVER['REQUEST_URI']);
             exit;
         }
+    }
+
+    function get_latest_hbm_package($dir_path, $pattern)
+    {
+        $files = scandir($dir_path);
+
+        // Filter files based on the pattern
+        $filtered_files = array_filter($files, function ($file) use ($pattern) {  // Note the "use" keyword here
+            $regex_match = '/^' . $pattern . '-\d{4}-\d{2}-\d{2}\.json$/';
+            $found_file =  preg_match($regex_match, $file);
+            return $found_file;
+        });
+
+        // If no files found, return null
+        if (empty($filtered_files)) {
+            return false;
+        }
+
+        // Sort the files
+        sort($filtered_files);
+
+        // Get the latest file
+        $latest_file = end($filtered_files);
+
+        // Return the full path of the latest file
+        return $dir_path . '/' . $latest_file;
     }
 }
