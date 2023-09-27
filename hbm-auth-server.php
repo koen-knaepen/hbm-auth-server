@@ -50,29 +50,15 @@ $hbm_server_plugin = new HBM_Server_Auth(HBM_PLUGIN_FILE);
 
 function test_all_hooks_of_plugin()
 {
-    // $pods_api = pods_api();
-    // error_log('pods_api' . print_r($pods_api, true));
-    // $api_methods = get_class_methods($pods_api);
-    // error_log('pods api methods' . print_r($api_methods, true));
-    // $pods_init = pods_init();
-    // error_log('pods_init' . print_r($pods_init, true));
-    // $init_methods = get_class_methods($pods_init);
-    // error_log('pods init methods' . print_r($init_methods, true));
-    // $pods_components_class = pods_components();
-    // error_log('pods_components' . print_r($pods_components_class, true));
-    // $components_methods = get_class_methods($pods_components_class);
-    // error_log('pods components methods' . print_r($components_methods, true));
-    // $pods_components = $pods_components_class->get_components();
-    // error_log('pods_components' . print_r($pods_components, true));
-    // $migrate_active = $pods_components_class->is_component_active('migrate-packages');
-    // error_log('migrate active before -> ' . print_r($migrate_active, true));
-    // $pods_components_class->activate_component('migrate-packages');
-    // $migrate_active = $pods_components_class->is_component_active('migrate-packages');
-    // error_log('migrate active after -> ' . print_r($migrate_active, true));
-    // $pods_migrate_class = pods_migrate();
-    // $pods_migrate_methods = get_class_methods($pods_migrate_class);
-    // error_log('pods migrate methods' . print_r($pods_migrate_methods, true));
+    $settings = pods('hbm-auth-server-application');
+    $framework_options = $settings->fields('app_framework');
+    error_log('settings - framework: ' . print_r($framework_options, true));
+    // pods('hbm-auth-server-application')->save($framework_options);
+    // $setting_methods = get_class_methods($settings);
+    // error_log('settings methods' . print_r($setting_methods, true));
+    // $settings_data = $settings->field('hbm_auth_server_test_domain');
+    // error_log('settings data' . print_r($settings_data, true));
 }
 
-// add_action('plugins_loaded', 'test_all_hooks_of_plugin');
+add_action('admin_init', 'test_all_hooks_of_plugin');
 // $hbm_server_plugin->run();

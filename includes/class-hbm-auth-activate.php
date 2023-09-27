@@ -148,22 +148,43 @@ class HBM_Auth_Activate
         $installed_components = get_transient('hbm_pods_import_package');
         if ($installed_components !== false) {
             $pods_slug = $this->get_latest_hbm_package(HBM_PLUGIN_PATH . 'pods-packages', 'hbm-auth-server-pods-package');
-            if ($pods_slug === false) {
-                delete_transient('hbm_pods_import_package');
-                throw new Exception('No PODS package found.');
-            }
+            $pods_file = HBM_PLUGIN_PATH . 'pods-packages/' . $pods_slug;
             error_log('pods slug: ' . $pods_slug);
-            $json_data = file_get_contents($pods_slug);
+            $json_data = file_get_contents($pods_file);
             $pods_api = pods_api();
-            // if (!pods('hbm-auth')) {
-            try {
-                $package_result = $pods_api->import_package($json_data, false);
-            } catch (Exception $e) {
-                error_log('Error importing PODS package: ' . print_r($e->getMessage(), true));
-            } catch (Error $e) {
-                error_log('Error importing PODS package: ' . print_r($e->getMessage(), true));
+            $pods_upload = false;
+            if (!pods('hbm-auth-server')) {
+                if ($pods_slug === false) {
+                    delete_transient('hbm_pods_import_package');
+                    throw new Exception('No PODS package found.');
+                } else {
+                    $pods_upload = true;
+                }
             }
-            // }
+            if (pods('hbm-auth-server') && $pods_slug !== false) {
+                $auth_pods_update = pods('hbm-auth-server')->field('hbm_auth_server_automatic_updates');
+                if ($auth_pods_update) {
+                    $auth_pods_file = pods('hbm-auth-server')->field('hbm_auth_server_initial_pods_package');
+                    $auth_pods_checksum = pods('hbm-auth-server')->field('hbm_auth_server_pods_package_checksum');
+                    $pods_checksum = hash_file('sha256', $pods_file);
+                    if ($auth_pods_file !== $pods_slug && $auth_pods_checksum !== $pods_checksum) {
+                        $pods_upload = true;
+                    }
+                }
+            }
+            if ($pods_upload) {
+                try {
+                    pods('hbm-auth-server')->save(array(
+                        'hbm_auth_server_initial_pods_package' => $pods_slug,
+                        'hbm_auth_server_pods_package_checksum' => $pods_checksum
+                    ), null, true);
+                    $package_result = $pods_api->import_package($json_data, false);
+                } catch (Exception $e) {
+                    error_log('Error importing PODS package: ' . print_r($e->getMessage(), true));
+                } catch (Error $e) {
+                    error_log('Error importing PODS package: ' . print_r($e->getMessage(), true));
+                }
+            }
             if ($installed_components != 'enabled') {
                 $pods_components_class = pods_components();
                 $current_components = $pods_components_class->get_components();
@@ -204,6 +225,10 @@ class HBM_Auth_Activate
         $latest_file = end($filtered_files);
 
         // Return the full path of the latest file
-        return $dir_path . '/' . $latest_file;
+        return  $latest_file;
+    }
+
+    function checksum_control($file_path)
+    {
     }
 }

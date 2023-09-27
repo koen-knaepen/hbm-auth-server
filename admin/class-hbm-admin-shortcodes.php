@@ -19,6 +19,12 @@ class HBM_Server_Auth_Admin_Shortcodes
 
     function shortcode_callback($attributes)
     {
+        $specific_domain = pods('hbm-auth-server')->field('hbm_auth_server_test_server');
+        if ($specific_domain) {
+            $domain = pods('hbm-auth-server')->field('hbm_auth_server_test_domain');
+        } else {
+            $domain = get_site_url();
+        }
         $attributes = shortcode_atts(
             array(
                 'slug' => 'callback',
@@ -40,7 +46,7 @@ class HBM_Server_Auth_Admin_Shortcodes
                 $slug = '/wp-json/hbm-auth/callback';
                 break;
         }
-        return get_site_url() . $slug;
+        return $domain . $slug;
     }
 
     function shortcode_copy_clipboard_wrapper($attributes = null, $content = null)
