@@ -50,9 +50,17 @@ $hbm_server_plugin = new HBM_Server_Auth(HBM_PLUGIN_FILE);
 
 function test_all_hooks_of_plugin()
 {
-    $settings = pods('hbm-auth-server-application');
-    $framework_options = $settings->fields('app_framework');
-    error_log('settings - framework: ' . print_r($framework_options, true));
+    $pods_api = pods_api('hbm-auth-server-application');
+
+    $framework_object = $pods_api->load_field('app_framework');
+    $framework_id = $framework_object->get_arg('id');
+    $framework_to_save = array(
+        'id' => $framework_id,
+        'pod' => 'hbm-auth-server-application',
+        'name' => 'app_framework',
+        'pick_custom' => 'cognito|AWS Cognito' . PHP_EOL . 'entra|Microsoft Entra',
+    );
+    $pods_api->save_field($framework_to_save);
     // pods('hbm-auth-server-application')->save($framework_options);
     // $setting_methods = get_class_methods($settings);
     // error_log('settings methods' . print_r($setting_methods, true));
@@ -60,5 +68,5 @@ function test_all_hooks_of_plugin()
     // error_log('settings data' . print_r($settings_data, true));
 }
 
-add_action('admin_init', 'test_all_hooks_of_plugin');
+// add_action('admin_init', 'test_all_hooks_of_plugin');
 // $hbm_server_plugin->run();

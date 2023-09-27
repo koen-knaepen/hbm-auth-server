@@ -151,7 +151,6 @@ class HBM_Auth_Activate
             $pods_file = HBM_PLUGIN_PATH . 'pods-packages/' . $pods_slug;
             error_log('pods slug: ' . $pods_slug);
             $json_data = file_get_contents($pods_file);
-            $pods_api = pods_api();
             $pods_upload = false;
             if (!pods('hbm-auth-server')) {
                 if ($pods_slug === false) {
@@ -174,6 +173,7 @@ class HBM_Auth_Activate
             }
             if ($pods_upload) {
                 try {
+                    $pods_api = pods_api();
                     pods('hbm-auth-server')->save(array(
                         'hbm_auth_server_initial_pods_package' => $pods_slug,
                         'hbm_auth_server_pods_package_checksum' => $pods_checksum
