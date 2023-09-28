@@ -53,7 +53,7 @@ class HBM_Server_Auth_Admin_options
         // 2. Enqueue FontAwesome
         wp_enqueue_style('fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', array(), '5.15.3');
 
-        wp_enqueue_style('custom-admin-styles', HBM_AUTH_SERVER_URL . '/admin/css/admin.css');
+        wp_enqueue_style('server-admin-styles', HBM_AUTH_SERVER_URL . '/admin/css/admin-server.css');
         wp_enqueue_script('hbm-auth-admin-js', HBM_AUTH_SERVER_URL . '/admin/js/admin-scripts.js', array(), '1.0.0', true);
         wp_enqueue_script('hbm-spinner', HBM_AUTH_SERVER_URL . '/admin/js/spinner-config.js', array('jquery'), '1.0.0', true);
         wp_localize_script(

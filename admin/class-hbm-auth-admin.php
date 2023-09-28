@@ -27,22 +27,17 @@ class HBM_Server_Auth_Admin
         if (is_admin()) {
             $this->admin_options = new HBM_Server_Auth_Admin_Options();
             $this->admin_shortcodes = new HBM_Server_Auth_Admin_Shortcodes();
-            settings_errors('hbm-auth', false, true); // Display the error message in the admin panel
             add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
         }
     }
 
     function hbm_modify_plugin_data($all_plugins)
     {
-        $original_plugin_path = 'hbm-auth-server/hbm-auth-server.php';
-        $is_active = is_plugin_active($original_plugin_path);
+        $original_plugin_path = HBM_AUTH_SERVER_BASENAME;
+        $is_active = is_plugin_active(HBM_AUTH_SERVER_BASENAME);
         if ($is_active) {
-            $plugin_path = 'pods/init.php';
-            if (isset($all_plugins[$plugin_path])) {
-                $all_plugins[$plugin_path]['Description'] .= ' Do not deactivate or delete this plugin as long as you want to use the HBM Auth Server plugin.';
-            }
-            $all_plugins[$original_plugin_path]['Description'] = 'HBM Auth Server transforms your Wordpress Install into a Single Sign-On Server with the help of AWS Cognito or MS Entra.'
-                . ' Make sure you NEVER deactivate or delete the PODS plugin as long as you want to use the HBM Auth Server plugin.';
+            $all_plugins[HBM_AUTH_SERVER_BASENAME]['Description'] = 'HBM Auth Server transforms your Wordpress Install into a Single Sign-On Server with the help of AWS Cognito or MS Entra.'
+                . ' Make sure you NEVER deactivate or delete the HBM Main Plugin or PODS plugin as long as you want to use the HBM Auth Server plugin.';
             return $all_plugins;
         }
     }

@@ -1,0 +1,58 @@
+.hbm-admin .cf-container__tabs-item {
+    background-color: #dda14a !important;
+    border: 1px solid #49c0de !important;
+}
+
+.hbm-admin .cf-container__tabs-item button {
+    color: #ffffff !important;
+}
+
+.hbm-admin .cf-container__tabs-item--current {
+    background-color: #49c0de !important;
+    border: 1px solid #dda14a !important;
+}
+
+.hbm-validMessage {
+    background-color: #a6ce38;
+    padding: 0 0 0 12px !important;
+    font-weight: bold;
+    color: #49c0de;
+}
+
+.hbm-spinner {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background:
+        radial-gradient(farthest-side, #49c0de 95%, #0000) 50% 1px/3px 3px no-repeat,
+        radial-gradient(farthest-side, #0000 calc(100% - 5px), #dda14a 0);
+    animation: spin 2s infinite linear;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(1turn)
+    }
+}
+
+.hbm-spinner-wrapper {
+    display: none;
+}
+
+.hbm-auth-horizontal-radio ul {
+    display: flex;
+    flex-direction: row;
+}
+
+.hbm-auth-horizontal-radio li {
+    flex: none !important;
+    margin-right: 10px !important;
+}
+
+.hbm-input-readonly input {
+    border: none !important;
+}
+
+[data-slug="hbm-main"].active .deactivate {
+    display: none !important;
+}

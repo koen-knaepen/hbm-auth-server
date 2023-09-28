@@ -20,61 +20,50 @@ include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 class HBM_Auth_Activate
 {
-    public function __construct()
+    private $main_activation;
+    public function __construct($main_activation)
     {
-        register_activation_hook(HBM_AUTH_SERVER_FILE, array($this, 'hbm_plugin_activate'));
-        // add_action('activated_plugin', array($this, 'hbm_on_plugin_activation'), 10, 1);
-        // add_action('admin_init', array($this, 'hbm_check_pods_import_activation'));
-        // add_action('admin_init', array($this, 'hbm_intialize_pods_packages'));
-    }
-
-    function hbm_plugin_activate()
-    {
-        if (!current_user_can('activate_plugins')) {
-            return;
-        }
-        try {
-            $plugin_path = 'hbm-main/hbm-main.php';
-            $all_plugins = get_plugins();
-            error_log('All plugins: ' . print_r($all_plugins, true));
-
-            if (isset($all_plugins[$plugin_path])) {
-                if (!is_plugin_active($plugin_path)) {
-                    error_log('Plugin is not active');
-                    return;
-                }
-            }
-        } catch (Exception $e) {
-            error_log('Error activating plugin: ' . $e->getMessage());
-        } catch (Error $e) {
-            error_log('Error activating plugin: ' . $e->getMessage());
-        }
-    }
-
-    function install_pods_plugin()
-    {
-        $plugin_zip_url = 'https://downloads.wordpress.org/plugin/pods.latest-stable.zip';
-        $plugin_directory = WP_PLUGIN_DIR . '/pods';
-
-        if (file_exists($plugin_directory)) {
-            return 'Plugin already installed.';
-        }
-
-        try {
-            $upgrader = new Plugin_Upgrader(new Silent_Installer_Skin());
-            $installed = $upgrader->install($plugin_zip_url);
-        } catch (Exception $e) {
-            error_log('Error installing PODS plugin with Plugin_Upgrader: ' . $e->getMessage());
-        } catch (Error $e) {
-            error_log('Error installing PODS plugin with Plugin_Upgrader: ' . $e->getMessage());
-        }
-        if ($installed) {
-            return 'Plugin installed successfully.';
+        $this->main_activation = $main_activation;
+        if (!$this->main_activation) {
+            add_action('activated_plugin', array($this, 'deactivate_again'));
+            add_action('admin_init', array($this, 'hbm_check_for_admin_notices'));
         } else {
-            return 'Plugin installation failed.';
+            add_action('activated_plugin', array($this, 'hbm_on_plugin_activation'), 10, 1);
+            add_action('admin_init', array($this, 'hbm_auth_server_check_pods_import_activation'));
+            add_action('admin_init', array($this, 'hbm_auth_server_intialize_pods_packages'));
         }
     }
 
+    /***************************  THIS PART IS TO HANDLE PREMATURE ACTIVATION ***************/
+    function register_special_notice_styles()
+    {
+        wp_enqueue_style('custom-notice-styles', HBM_AUTH_SERVER_URL . '/admin/css/remove-system-notice.css');
+    }
+
+    function deactivate_again()
+    {
+        set_transient('hbm_show_admin_notice', true, 60);
+    }
+
+    function hbm_display_admin_notices()
+    {
+        add_settings_error('hbm-main', 'hbm-auth', 'The HBM Main plugin is not active. Please activate it first.', 'warning');
+        settings_errors('hbm-main');
+        deactivate_plugins(HBM_AUTH_SERVER_BASENAME);
+    }
+
+    function hbm_check_for_admin_notices()
+    {
+        // Check if the transient exists
+        if (get_transient('hbm_show_admin_notice')) {
+            add_action('admin_enqueue_scripts', array($this, 'register_special_notice_styles'));
+            add_action('admin_notices', array($this, 'hbm_display_admin_notices'));
+            // Delete the transient
+            delete_transient('hbm_show_admin_notice');
+        }
+    }
+
+    /***************************  THIS PART IS TO HANDLE ACTIVATION AND INSTALL OF PODS PACKAGES ***************/
     function hbm_on_plugin_activation($plugin)
     {
         if ($plugin == HBM_AUTH_SERVER_BASENAME) {
@@ -87,7 +76,7 @@ class HBM_Auth_Activate
             }
         }
     }
-    function hbm_check_pods_import_activation()
+    function hbm_auth_server_check_pods_import_activation()
     {
         if (get_transient('hbm_pods_migrate_activation')) {
             $installed_components = array();
@@ -107,13 +96,12 @@ class HBM_Auth_Activate
     }
 
 
-    function hbm_intialize_pods_packages()
+    function hbm_auth_server_intialize_pods_packages()
     {
         $installed_components = get_transient('hbm_pods_import_package');
         if ($installed_components !== false) {
             $pods_slug = $this->get_latest_hbm_package(HBM_AUTH_SERVER_PATH . 'pods-packages', 'hbm-auth-server-pods-package');
             $pods_file = HBM_AUTH_SERVER_PATH . 'pods-packages/' . $pods_slug;
-            error_log('pods slug: ' . $pods_slug);
             $json_data = file_get_contents($pods_file);
             $pods_upload = false;
             if (!pods('hbm-auth-server')) {
@@ -130,7 +118,7 @@ class HBM_Auth_Activate
                     $auth_pods_file = pods('hbm-auth-server')->field('hbm_auth_server_initial_pods_package');
                     $auth_pods_checksum = pods('hbm-auth-server')->field('hbm_auth_server_pods_package_checksum');
                     $pods_checksum = hash_file('sha256', $pods_file);
-                    if ($auth_pods_file !== $pods_slug && $auth_pods_checksum !== $pods_checksum) {
+                    if ($auth_pods_file !== $pods_slug || $auth_pods_checksum !== $pods_checksum) {
                         $pods_upload = true;
                     }
                 }
@@ -190,9 +178,5 @@ class HBM_Auth_Activate
 
         // Return the full path of the latest file
         return  $latest_file;
-    }
-
-    function checksum_control($file_path)
-    {
     }
 }
