@@ -1,8 +1,8 @@
 <?php
 
-include_once HBM_PLUGIN_PATH . 'admin/options/class-options-main.php'; // main options
-include_once HBM_PLUGIN_PATH . 'admin/options/class-options-client-sites.php'; // Client sites options
-require_once HBM_PLUGIN_PATH . 'admin/options/helper-options.php'; // Logging functionality
+include_once HBM_AUTH_SERVER_PATH . 'admin/options/class-options-main.php'; // main options
+include_once HBM_AUTH_SERVER_PATH . 'admin/options/class-options-client-sites.php'; // Client sites options
+require_once HBM_AUTH_SERVER_PATH . 'admin/options/helper-options.php'; // Logging functionality
 
 class HBM_Server_Auth_Admin_options
 {
@@ -26,12 +26,12 @@ class HBM_Server_Auth_Admin_options
         $this->framework_option = get_option('_hbm-auth-framework'); // Retrieve the framework from the main options;
         switch ($this->framework_option) {
             case 'cognito':
-                include_once HBM_PLUGIN_PATH . 'admin/options/class-options-cognito.php'; // Configuration options for Cognito
+                include_once HBM_AUTH_SERVER_PATH . 'admin/options/class-options-cognito.php'; // Configuration options for Cognito
                 $this->framework = new HBM_Auth_Admin_Options_Cognito();
                 $this->framework_label = 'Cognito Configuration';
                 break;
             case 'entra':
-                include_once HBM_PLUGIN_PATH . 'admin/options/class-options-entra.php'; // Configuration options for Entra
+                include_once HBM_AUTH_SERVER_PATH . 'admin/options/class-options-entra.php'; // Configuration options for Entra
                 $this->framework = new HBM_Auth_Admin_Options_Entra();
                 $this->framework_label = 'Entra Configuration';
                 break;
@@ -53,9 +53,9 @@ class HBM_Server_Auth_Admin_options
         // 2. Enqueue FontAwesome
         wp_enqueue_style('fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', array(), '5.15.3');
 
-        wp_enqueue_style('custom-admin-styles', HBM_PLUGIN_URL . '/admin/css/admin.css');
-        wp_enqueue_script('hbm-auth-admin-js', HBM_PLUGIN_URL . '/admin/js/admin-scripts.js', array(), '1.0.0', true);
-        wp_enqueue_script('hbm-spinner', HBM_PLUGIN_URL . '/admin/js/spinner-config.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_style('custom-admin-styles', HBM_AUTH_SERVER_URL . '/admin/css/admin.css');
+        wp_enqueue_script('hbm-auth-admin-js', HBM_AUTH_SERVER_URL . '/admin/js/admin-scripts.js', array(), '1.0.0', true);
+        wp_enqueue_script('hbm-spinner', HBM_AUTH_SERVER_URL . '/admin/js/spinner-config.js', array('jquery'), '1.0.0', true);
         wp_localize_script(
             'hbm-spinner',
             'spinnerConfig',

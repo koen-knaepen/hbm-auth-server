@@ -17,73 +17,37 @@ include_once ABSPATH . 'wp-admin/includes/plugin.php';
 * @package HBM_Auth
 * @class HBM_Auth_Activate
 */
-class Silent_Installer_Skin extends Plugin_Installer_Skin
-{
-
-    public function header()
-    {
-        // echo "Starting the plugin installation process...";
-        // echo "The plugin installation process may take a few minutes...";
-        // echo "We'll install also the free plugin PODS, which is required for this plugin to work.";
-        // echo "Make sure you are connected to the internet.";
-    }
-    public function footer()
-    {
-    }
-    public function feedback($string, ...$args)
-    {
-    }
-    public function error($errors)
-    {
-        error_log('Error: ' . json_encode($errors, JSON_PRETTY_PRINT));
-    }
-}
-
 
 class HBM_Auth_Activate
 {
     public function __construct()
     {
-        register_activation_hook(HBM_PLUGIN_FILE, array($this, 'hbm_plugin_activate'));
-        add_action('activated_plugin', array($this, 'hbm_on_plugin_activation'), 10, 1);
-        add_action('admin_init', array($this, 'hbm_check_pods_import_activation'));
-        add_action('admin_init', array($this, 'hbm_intialize_pods_packages'));
+        register_activation_hook(HBM_AUTH_SERVER_FILE, array($this, 'hbm_plugin_activate'));
+        // add_action('activated_plugin', array($this, 'hbm_on_plugin_activation'), 10, 1);
+        // add_action('admin_init', array($this, 'hbm_check_pods_import_activation'));
+        // add_action('admin_init', array($this, 'hbm_intialize_pods_packages'));
     }
 
-    public function hbm_plugin_activate()
+    function hbm_plugin_activate()
     {
         if (!current_user_can('activate_plugins')) {
             return;
         }
         try {
-            $plugin_path = 'pods/init.php';
+            $plugin_path = 'hbm-main/hbm-main.php';
             $all_plugins = get_plugins();
+            error_log('All plugins: ' . print_r($all_plugins, true));
 
             if (isset($all_plugins[$plugin_path])) {
                 if (!is_plugin_active($plugin_path)) {
-                    $result = activate_plugin($plugin_path);
-                    if (is_wp_error($result)) {
-                        error_log('Error activating PODS plugin: ' . $result->get_error_message());
-                        return;
-                    }
-                }
-            } else {
-                $install_result = $this->install_pods_plugin();
-                if ($install_result === 'Plugin installed successfully.') {
-                    $result = activate_plugin($plugin_path);
-                    if (is_wp_error($result)) {
-                        error_log('Error activating PODS plugin after installation: ' . $result->get_error_message());
-                        return;
-                    }
-                } else {
-                    error_log($install_result);
+                    error_log('Plugin is not active');
                     return;
                 }
             }
         } catch (Exception $e) {
-            error_log('Error activating PODS plugin: ' . $e->getMessage());
+            error_log('Error activating plugin: ' . $e->getMessage());
         } catch (Error $e) {
-            error_log('Error activating PODS plugin: ' . $e->getMessage());
+            error_log('Error activating plugin: ' . $e->getMessage());
         }
     }
 
@@ -113,7 +77,7 @@ class HBM_Auth_Activate
 
     function hbm_on_plugin_activation($plugin)
     {
-        if ($plugin == HBM_PLUGIN_BASENAME) {
+        if ($plugin == HBM_AUTH_SERVER_BASENAME) {
             $pods_components_class = pods_components();
             $migrate_active = $pods_components_class->is_component_active('migrate-packages');
             if ($migrate_active) {
@@ -147,8 +111,8 @@ class HBM_Auth_Activate
     {
         $installed_components = get_transient('hbm_pods_import_package');
         if ($installed_components !== false) {
-            $pods_slug = $this->get_latest_hbm_package(HBM_PLUGIN_PATH . 'pods-packages', 'hbm-auth-server-pods-package');
-            $pods_file = HBM_PLUGIN_PATH . 'pods-packages/' . $pods_slug;
+            $pods_slug = $this->get_latest_hbm_package(HBM_AUTH_SERVER_PATH . 'pods-packages', 'hbm-auth-server-pods-package');
+            $pods_file = HBM_AUTH_SERVER_PATH . 'pods-packages/' . $pods_slug;
             error_log('pods slug: ' . $pods_slug);
             $json_data = file_get_contents($pods_file);
             $pods_upload = false;

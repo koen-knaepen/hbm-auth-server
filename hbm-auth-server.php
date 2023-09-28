@@ -25,28 +25,28 @@ if (!defined('ABSPATH')) {
 // add_filter('https_local_ssl_verify', '__return_false');
 
 // Define constants for plugin paths
-define('HBM_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('HBM_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('HBM_PLUGIN_FILE', __FILE__);
-define('HBM_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('HBM_AUTH_SERVER_PATH', plugin_dir_path(__FILE__));
+define('HBM_AUTH_SERVER_URL', plugin_dir_url(__FILE__));
+define('HBM_AUTH_SERVER_FILE', __FILE__);
+define('HBM_AUTH_SERVER_BASENAME', plugin_basename(__FILE__));
 
 
 
 // Include necessary files
-require_once HBM_PLUGIN_PATH . 'admin/log-script.php'; // Logging functionality
-require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth.php'; // Main plugin class
+require_once HBM_AUTH_SERVER_PATH . 'admin/log-script-server.php'; // Logging functionality
+require_once HBM_AUTH_SERVER_PATH . 'includes/class-hbm-auth.php'; // Main plugin class
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 // Bootstrap Carbon Fields
 add_action('after_setup_theme', 'crb_load');
 function crb_load()
 {
-    require_once HBM_PLUGIN_PATH . 'vendor/autoload.php';
+    require_once HBM_AUTH_SERVER_PATH . 'vendor/autoload.php';
     \Carbon_Fields\Carbon_Fields::boot();
 }
 
 // Initialize the main plugin class
-$hbm_server_plugin = new HBM_Server_Auth(HBM_PLUGIN_FILE);
+$hbm_server_plugin = new HBM_Server_Auth(HBM_AUTH_SERVER_FILE);
 
 function test_all_hooks_of_plugin()
 {

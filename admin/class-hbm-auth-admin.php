@@ -1,7 +1,7 @@
 <?php
 
-require_once HBM_PLUGIN_PATH . 'admin/options/class-options.php'; // Admin-related functionality
-require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
+require_once HBM_AUTH_SERVER_PATH . 'admin/options/class-options.php'; // Admin-related functionality
+require_once HBM_AUTH_SERVER_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
 
 
 /**

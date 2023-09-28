@@ -1,6 +1,6 @@
 <?php
 // deactivate.php
-include_once HBM_PLUGIN_PATH . 'admin/cleanup-db.php';
+include_once HBM_AUTH_SERVER_PATH . 'admin/cleanup-db.php';
 
 function hbm_plugin_deactivate()
 {
