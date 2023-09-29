@@ -25,6 +25,7 @@ class HBM_Auth_Activate
     {
         $this->main_activation = $main_activation;
         if (!$this->main_activation) {
+            error_log('Constants of the plugin' . plugin_dir_path(__FILE__));
             add_action('activated_plugin', array($this, 'deactivate_again'));
             add_action('admin_init', array($this, 'hbm_check_for_admin_notices'));
         } else {
