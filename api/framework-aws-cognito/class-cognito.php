@@ -1,5 +1,7 @@
 <?php
 
+namespace HBM\auth_server;
+
 /**
  * 
  * 

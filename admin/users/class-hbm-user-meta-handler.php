@@ -1,4 +1,7 @@
 <?php
+
+namespace HBM\auth_server;
+
 class HBM_User_Meta_Handler
 {
 
@@ -61,7 +64,4 @@ class HBM_User_Meta_Handler
         $hbm_entra_id_value = 'some_value'; // Replace with the actual value you want to save
         update_user_meta($user->ID, 'hbm_entra_id', $hbm_entra_id_value);
     }
-
-
-
 }

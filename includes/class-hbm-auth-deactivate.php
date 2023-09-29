@@ -1,11 +1,13 @@
 <?php
 
+namespace HBM\auth_server;
+
 class HBM_Auth_Deactivate
 {
 
     public function __construct()
     {
-        register_deactivation_hook(HBM_AUTH_SERVER_FILE, array($this, 'hbm_plugin_deactivate')); // Activation-related functionality
+        register_deactivation_hook(HBM_PLUGIN_FILE, array($this, 'hbm_plugin_deactivate')); // Activation-related functionality
 
     }
 

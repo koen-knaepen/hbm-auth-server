@@ -1,4 +1,9 @@
 <?php
+
+namespace HBM\auth_server;
+
+namespace HBM\auth_server;
+
 function hbm_cleanup_database()
 {
     // Delete options created by Carbon Fields or any other data related to your plugin.
@@ -15,5 +20,4 @@ function hbm_cleanup_database()
     foreach ($results as $option_name) {
         delete_option($option_name);
     }
-
 }

@@ -1,4 +1,6 @@
 <?php
+
+namespace HBM\auth_server;
 // class-hbm-callback-api.php
 /**
  * Summary of class-hbm-callback-api
@@ -174,14 +176,12 @@ class HBM_Callback_Handler
         }
         if ($state_payload->mode == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"
-                . "<p>Initatiate request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"
-            ;
+                . "<p>Initatiate request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
             echo_modal($initiate_endpoint, $message);
         } else {
             hbm_set_headers();
             echo "<script type='text/javascript'>window.location.href = '{$initiate_endpoint}';</script>";
         }
-
     }
 
     public function hbm_handle_framework_logout(WP_REST_Request $request)
@@ -204,7 +204,6 @@ class HBM_Callback_Handler
             hbm_set_headers();
             echo "<script type='text/javascript'>window.location.href = '{$logout_url}';</script>";
         }
-
     }
 
     public function hbm_set_sso(WP_REST_Request $request)
@@ -227,8 +226,7 @@ class HBM_Callback_Handler
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Access Code is decoded and valid: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"
                 . "<p>{$framework_context->label} user: </p><pre>" . json_encode($framework_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>'
-                . "<p>SSO user: </p><pre>" . json_encode($sso_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>'
-            ;
+                . "<p>SSO user: </p><pre>" . json_encode($sso_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
             echo_modal(null, $message);
         }
     }

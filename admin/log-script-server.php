@@ -1,5 +1,9 @@
 <?php
 
+namespace HBM\auth_server;
+
+namespace HBM\auth_server;
+
 // @todo rewrite this so that the scripts are sent with a regiter instead of action
 function echo_modal($redirect_url, $extra_content = '')
 {

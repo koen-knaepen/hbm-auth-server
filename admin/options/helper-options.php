@@ -1,5 +1,7 @@
 <?php
 
+namespace HBM\auth_server;
+
 function init_spinner($cb_name, $js_name, $action_name, $help_text, $button_text, $valid_message)
 {
     $spinner_fields =

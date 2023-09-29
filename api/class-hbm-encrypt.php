@@ -1,4 +1,7 @@
 <?php
+
+namespace HBM\auth_server;
+
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -86,5 +89,4 @@ class HBM_Server_JWT_Manager
             return 'error in decoding jwt' . $e->getMessage();
         }
     }
-
 }

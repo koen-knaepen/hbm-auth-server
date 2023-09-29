@@ -1,5 +1,10 @@
 <?php
-include_once HBM_AUTH_SERVER_PATH . 'admin/cleanup-db.php';
+
+namespace HBM\auth_server;
+
+namespace HBM\auth_server;
+
+include_once HBM_PLUGIN_PATH . 'admin/cleanup-db.php';
 
 class HBM_Auth_Admin_Options_Main
 {
@@ -13,7 +18,7 @@ class HBM_Auth_Admin_Options_Main
     {
 
         // 2. Enqueue the script to ask for confirmation when deactivating the plugin
-        wp_enqueue_script('hbm-deactivate-script', HBM_AUTH_SERVER_URL . '/admin/js/deactivate-script.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_script('hbm-deactivate-script', HBM_PLUGIN_URL . '/admin/js/deactivate-script.js', array('jquery'), '1.0.0', true);
 
         // 3. Pass the value to the script for the deactivate script
         $delete_option = carbon_get_theme_option('hbm-auth-delete-fields-on-deactivate');

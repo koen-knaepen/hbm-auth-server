@@ -1,5 +1,7 @@
 <?php
 
+namespace HBM\auth_server;
+
 /**
  * 
  * 
@@ -120,5 +122,4 @@ class HBM_Framework_Entra
       );
       return (object) $wp_user;
    }
-
 }

@@ -15,33 +15,38 @@
  * Domain Path:       /languages
  */
 
+namespace HBM\auth_server;
+
+use function \HBM\hbm_init_constants;
+
+
 // If this file is called directly, abort.
 if (!defined('ABSPATH')) {
     die("You are not supposed to be here");
 }
 
-// Disable SSL verification for the API requests !!!! REMOVE THIS IN PRODUCTION !!!!
-// add_filter('https_ssl_verify', '__return_false');
-// add_filter('https_local_ssl_verify', '__return_false');
+// HBM_MAIN_UTIL_PATH is a global constant defined to get access to the main utilities.
+if (!defined('HBM_MAIN_UTIL_PATH')) define('HBM_MAIN_UTIL_PATH', \WP_PLUGIN_DIR . '/hbm-main/main-utility/');
 
-// Define constants for plugin paths
-define('HBM_AUTH_SERVER_PATH', plugin_dir_path(__FILE__));
-define('HBM_AUTH_SERVER_URL', plugin_dir_url(__FILE__));
-define('HBM_AUTH_SERVER_FILE', __FILE__);
-define('HBM_AUTH_SERVER_BASENAME', plugin_basename(__FILE__));
+// CREATE THE HBM CONSTANTS 
+// The hbm-constants.php file is located in the main-utility folder.    
+// It contains the hbm_define_constants() function that defines the constants for the plugin paths.
+// HBM_PLUGIN_PATH, HBM_PLUGIN_URL
+// HBM_PLUGIN_FILE, HBM_PLUGIN_BASENAME
+// HBM_PLUGIN_NAME, HBM_PLUGIN_VERSION
+require_once \HBM_MAIN_UTIL_PATH .  'main-utils.php'; // Constants class
 
-
+hbm_init_constants(__NAMESPACE__, __FILE__);
 
 // Include necessary files
-require_once HBM_AUTH_SERVER_PATH . 'admin/log-script-server.php'; // Logging functionality
-require_once HBM_AUTH_SERVER_PATH . 'includes/class-hbm-auth-server.php'; // Main plugin class
-require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+require_once HBM_PLUGIN_PATH . 'admin/log-script-server.php'; // Logging functionality
+require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth-server.php'; // Main plugin class
 
 // Bootstrap Carbon Fields
-add_action('after_setup_theme', 'crb_load');
+add_action('after_setup_theme', __NAMESPACE__ . '\crb_load');
 function crb_load()
 {
-    require_once HBM_AUTH_SERVER_PATH . 'vendor/autoload.php';
+    require_once HBM_PLUGIN_PATH . 'vendor/autoload.php';
     \Carbon_Fields\Carbon_Fields::boot();
 }
 

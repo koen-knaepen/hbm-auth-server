@@ -1,5 +1,9 @@
 <?php
 
+namespace HBM\auth_server;
+
+namespace HBM\auth_server;
+
 class HBM_Auth_Admin_Options_Entra
 {
 
@@ -77,5 +81,4 @@ class HBM_Auth_Admin_Options_Entra
             wp_send_json_success();
         }
     }
-
 }

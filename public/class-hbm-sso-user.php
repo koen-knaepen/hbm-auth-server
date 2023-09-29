@@ -1,5 +1,7 @@
 <?php
 
+namespace HBM\auth_server;
+
 /**
  * HBM_SSO_User Class
  *

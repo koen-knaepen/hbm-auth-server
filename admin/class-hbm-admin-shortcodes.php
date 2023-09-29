@@ -1,4 +1,8 @@
 <?php
+
+namespace HBM\auth_server;
+
+namespace HBM\auth_server;
 // class-km2c-shortcodes.php
 
 class HBM_Server_Auth_Admin_Shortcodes
