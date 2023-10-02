@@ -2,8 +2,6 @@
 
 namespace HBM\auth_server;
 
-namespace HBM\auth_server;
-
 require_once HBM_PLUGIN_PATH . 'admin/options/class-options.php'; // Admin-related functionality
 require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
 
