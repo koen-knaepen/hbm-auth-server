@@ -25,7 +25,7 @@ class HBM_Server_Auth
     {
         add_action('hbm_main_loaded', array($this, 'init_plugin'), 10, 1);
         if (is_admin()) {
-            $this->activate = new HBM_Auth_Activate();
+            $this->activate = HBM_Auth_Activate::create_instance();
         }
     }
 
