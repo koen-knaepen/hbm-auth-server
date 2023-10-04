@@ -46,32 +46,11 @@ require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth-server.php'; // Main plu
 add_action('after_setup_theme', __NAMESPACE__ . '\crb_load');
 function crb_load()
 {
-    require_once HBM_PLUGIN_PATH . 'vendor/autoload.php';
-    \Carbon_Fields\Carbon_Fields::boot();
+    if (!class_exists('\Carbon_Fields\Carbon_Fields')) {
+        require_once HBM_PLUGIN_PATH . 'vendor/autoload.php';
+        \Carbon_Fields\Carbon_Fields::boot();
+    }
 }
 
 // Initialize the main plugin class
-$hbm_server_plugin = new HBM_Server_Auth();
-
-function test_all_hooks_of_plugin()
-{
-    $pods_api = pods_api('hbm-auth-server-application');
-
-    $framework_object = $pods_api->load_field('app_framework');
-    $framework_id = $framework_object->get_arg('id');
-    $framework_to_save = array(
-        'id' => $framework_id,
-        'pod' => 'hbm-auth-server-application',
-        'name' => 'app_framework',
-        'pick_custom' => 'cognito|AWS Cognito' . PHP_EOL . 'entra|Microsoft Entra',
-    );
-    $pods_api->save_field($framework_to_save);
-    // pods('hbm-auth-server-application')->save($framework_options);
-    // $setting_methods = get_class_methods($settings);
-    // error_log('settings methods' . print_r($setting_methods, true));
-    // $settings_data = $settings->field('hbm_auth_server_test_domain');
-    // error_log('settings data' . print_r($settings_data, true));
-}
-
-// add_action('admin_init', 'test_all_hooks_of_plugin');
-// $hbm_server_plugin->run();
+$hbm_server_plugin = new HBM_Auth_Server();
