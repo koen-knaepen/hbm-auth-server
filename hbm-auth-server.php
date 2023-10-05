@@ -43,10 +43,11 @@ require_once HBM_PLUGIN_PATH . 'admin/log-script-server.php'; // Logging functio
 require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth-server.php'; // Main plugin class
 
 // Bootstrap Carbon Fields
-add_action('after_setup_theme', __NAMESPACE__ . '\crb_load');
+add_action('plugins_loaded', __NAMESPACE__ . '\crb_load');
 function crb_load()
 {
     if (!class_exists('\Carbon_Fields\Carbon_Fields')) {
+        define('Carbon_Fields\URL', trailingslashit(plugin_dir_url(__FILE__)) . 'vendor/htmlburger/carbon-fields/');
         require_once HBM_PLUGIN_PATH . 'vendor/autoload.php';
         \Carbon_Fields\Carbon_Fields::boot();
     }

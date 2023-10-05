@@ -52,7 +52,3 @@
 .hbm-input-readonly input {
     border: none !important;
 }
-
-[data-slug="hbm-main"].active .deactivate {
-    display: none !important;
-}

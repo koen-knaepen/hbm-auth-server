@@ -2,8 +2,6 @@
 
 namespace HBM\auth_server;
 
-namespace HBM\auth_server;
-
 include_once HBM_PLUGIN_PATH . 'admin/cleanup-db.php';
 
 class HBM_Auth_Admin_Options_Main

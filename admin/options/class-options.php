@@ -98,9 +98,10 @@ class HBM_Server_Auth_Admin_options
 
     public function register_auth_options()
     {
-
-
+        global $menu;
+        global $submenu;
         \Carbon_Fields\Container::make('theme_options', 'HBM Auth Server')
+            ->set_page_file('hbm-auth-server')
             ->set_classes('hbm-admin')
             ->add_tab(
                 ('Main Options'),
