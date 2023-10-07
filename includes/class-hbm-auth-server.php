@@ -38,6 +38,5 @@ class HBM_Auth_Server extends HBM_Root
 
     function fastlane()
     {
-        error_log('fastlane executed for ' . __NAMESPACE__ . ' plugin');
     }
 }
