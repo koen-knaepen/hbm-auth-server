@@ -2,46 +2,29 @@
 
 namespace HBM\auth_server;
 
-/**
- * 
- * 
- * 
- * 
- */
+require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
 
-class HBM_Framework_Cognito
+class HBM_Framework_Cognito extends HBM_Auth_Framework
 {
 
    private $framework_choosen;
 
-   public function __construct()
-   {
-      $this->framework_choosen = get_option('_hbm-auth-framework');
-      if ($this->framework_choosen != 'cognito') {
-         return;
-      }
-      add_filter("hbm_create_auth_endpoint", array($this, 'create_auth_endpoint'), 10, 4);
-      add_filter("hbm_get_access_code", array($this, 'exchange_code_for_tokens'), 10, 3);
-      add_filter("hbm_get_wp_user_data", array($this, 'transform_to_wp_user'), 10, 2);
-      add_filter("hbm_get_framework_context", array($this, 'get_framework_context'), 10, 1);
-   }
 
-   public function get_framework_context($default_value)
+   protected function set_context(): array
    {
       $context = array(
          'name' => 'cognito',
          'label' => 'Cognito',
-         'metadata' => "hbm_cognito_id",
          'auth_id_name' => 'sub',
       );
-      return (object) $context;
+      return  $context;
    }
-   public function create_auth_endpoint($default_value, $action, $redirect_url, $jwt)
+   public function create_auth_endpoint($action, $redirect_url, $jwt, $application)
    {
       $endpoint = "";
-      $userpool_sub_domain = get_option("_hbm-cognito-auth-userpool-domain");
-      $userpool_regio = get_option("_hbm-cognito-auth-regio");
-      $client_id = get_option("_hbm-cognito-auth-client-id");
+      $userpool_sub_domain = $application['cognito_userpool'];
+      $userpool_regio = $application['cognito_aws_regio'];
+      $client_id = $application['framework_client_id'];
 
       switch ($action) {
          case 'login':
@@ -63,7 +46,7 @@ class HBM_Framework_Cognito
       return $endpoint;
    }
 
-   public function exchange_code_for_tokens($default_value, $code, $action)
+   public function exchange_code_for_tokens($code, $application)
    {
       $sso_server = get_option('_hbm-auth-sso-server-url');
       if ($sso_server == '') {
@@ -127,7 +110,7 @@ class HBM_Framework_Cognito
       return json_decode($body, true);
    }
 
-   public function transform_to_wp_user($default_value, $cognito_user)
+   public function transform_to_wp_user($cognito_user)
    {
       $wp_user = array(
          'user_login' => $cognito_user->email,

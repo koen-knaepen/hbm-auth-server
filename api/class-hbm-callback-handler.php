@@ -5,11 +5,15 @@ namespace HBM\auth_server;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
+use function HBM\hbm_extract_domain;
 
 
 require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
 require_once HBM_MAIN_UTIL_PATH . 'helpers.php';
 require_once HBM_MAIN_UTIL_PATH . 'dev-tools.php';
+require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
+
+require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
 // class-hbm-callback-api.php
 /**
  * Summary of class-hbm-callback-api
@@ -162,15 +166,19 @@ class HBM_Callback_Handler
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
-        $pod = pods('hbm-auth-server-site', 0);
-
-        \hbm_explore_variabele($pod, HBM_PLUGIN_PATH);
-
-        // $all_id = $pod->find($params);
-
-
+        $domain = hbm_extract_domain($state_payload->domain);
+        error_log('Domain: ' . $domain);
+        $sites = \hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
+        if (empty($sites)) {
+            return new WP_Error('no_site', 'No site found', array('status' => 400));
+        }
+        error_log('Sites: ' . print_r($sites[0]['application'], true));
+        $application = $sites[0]['application'];
+        $framework = $application['app_framework'];
+        $framework_api = HBM_Auth_Framework::get_instance($framework);
         $redirect_url = $this->get_redirect_url($state_payload->action);
-        $initiate_endpoint = apply_filters('hbm_create_auth_endpoint', '', $state_payload->action, $redirect_url, $state_urlcoded);
+
+        $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
         error_log('Initiate endpoint: ' . $initiate_endpoint);
         if ($state_payload->action == 'logout') {
             do_action(
