@@ -5,7 +5,7 @@ namespace HBM\auth_server;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
-use function hbm_save_class_methods;
+
 
 require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
 require_once HBM_MAIN_UTIL_PATH . 'helpers.php';
@@ -162,19 +162,13 @@ class HBM_Callback_Handler
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
-        $pod = pods('hbm-auth-server-site');
-        $params = array(
-            'limit' => -1, // Retrieve all items
-        );
+        $pod = pods('hbm-auth-server-site', 0);
 
-        $all_id = $pod->find($params);
-        error_log('All id: ' . print_r($all_id, true));
+        \hbm_explore_variabele($pod, HBM_PLUGIN_PATH);
 
-        // while ($pod->fetch()) {
-        //     error_log($pod->display('title_field_name'));
-        //     error_log($pod->display('content_field_name'));
-        //     // echo $pod->display('your_custom_field_name');
-        // }
+        // $all_id = $pod->find($params);
+
+
         $redirect_url = $this->get_redirect_url($state_payload->action);
         $initiate_endpoint = apply_filters('hbm_create_auth_endpoint', '', $state_payload->action, $redirect_url, $state_urlcoded);
         error_log('Initiate endpoint: ' . $initiate_endpoint);
