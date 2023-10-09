@@ -22,7 +22,7 @@ class HBM_Auth_Server extends HBM_Root
 
     function init_plugin()
     {
-        require_once HBM_PLUGIN_PATH . 'api/class-hbm-api.php'; // API-related functionality
+        require_once HBM_PLUGIN_PATH . 'api/class-hbm-callback-handler.php'; // API-related functionality
         $current_domain = \hbm\hbm_get_current_domain();
         if ($current_domain == get_option('_hbm-auth-sso-server-url')) {
             session_start();
@@ -33,7 +33,7 @@ class HBM_Auth_Server extends HBM_Root
             require_once HBM_PLUGIN_PATH . 'admin/class-hbm-auth-admin.php'; // Admin-related functionality
             $this->admin = new HBM_Server_Auth_Admin();
         }
-        $this->api = new HBM_Server_API();
+        $this->api = new HBM_Callback_Handler();
     }
 
     function fastlane()

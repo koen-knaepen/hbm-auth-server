@@ -8,6 +8,7 @@ use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
 use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
+use function HBM\hbm_encode_transient_jwt;
 
 
 require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
@@ -30,19 +31,33 @@ require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
 
 class HBM_Callback_Handler
 {
-    private $secret_manager;
 
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
      */
-    public function __construct($jwt_manager)
+    public function __construct()
     {
-        $this->secret_manager = $jwt_manager;
         add_action('rest_api_init', array($this, 'hbm_register_callback_endpoint'));
         add_filter('hbm_get_redirect_url', array($this, 'get_redirect_url'), 10, 2);
     }
 
+
+    private function init_auth_framework($application)
+    {
+        $framework = $application['app_framework'];
+        return HBM_Auth_Framework::get_instance($framework);
+    }
+
+    private function get_application($input_domain)
+    {
+        $domain = hbm_extract_domain($input_domain);
+        $sites = \hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
+        if (empty($sites)) {
+            return false;
+        }
+        return $sites[0]['application'];
+    }
     public function enqueue_auth_script()
     {
     }
@@ -127,15 +142,11 @@ class HBM_Callback_Handler
         if (empty($code)) {
             return new \WP_Error('no_code', 'No code received', array('status' => 400));
         }
-        $domain = hbm_extract_domain($state_payload->domain);
-        $sites = \hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
-        if (empty($sites)) {
-            return new \WP_Error('no_site', 'No site found', array('status' => 400));
+        $application = $this->get_application($state_payload->domain);
+        if (!$application) {
+            new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
-        $application = $sites[0]['application'];
-        $framework = $application['app_framework'];
-        $framework_api = HBM_Auth_Framework::get_instance($framework);
-
+        $framework_api = $this->init_auth_framework($application);
         // Exchange the authorization code for tokens
         $tokens = $framework_api->exchange_code_for_tokens($code, $application);
         $framework_context = $framework_api->get_framework_context();
@@ -178,16 +189,14 @@ class HBM_Callback_Handler
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
-        $domain = hbm_extract_domain($state_payload->domain);
-        $sites = \hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
-        if (empty($sites)) {
-            return new \WP_Error('no_site', 'No site found', array('status' => 400));
+        $application = $this->get_application($state_payload->domain);
+        if (!$application) {
+            new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
-        $application = $sites[0]['application'];
-        $framework = $application['app_framework'];
-        $framework_api = HBM_Auth_Framework::get_instance($framework);
+        $framework_api = $this->init_auth_framework($application);
         $redirect_url = $this->get_redirect_url($state_payload->action, $application);
         error_log('Redirect URL: ' . $redirect_url);
+        error_log('application: ' . print_r($application, true));
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
         error_log('Initiate endpoint: ' . $initiate_endpoint);

@@ -3,6 +3,7 @@
 namespace HBM\auth_server;
 
 require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
+require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
 
 class HBM_Framework_Cognito extends HBM_Auth_Framework
 {
@@ -48,16 +49,18 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
 
    public function exchange_code_for_tokens($code, $application)
    {
-      $sso_server = get_option('_hbm-auth-sso-server-url');
-      if ($sso_server == '') {
-         $redirect_url = site_url('/wp-json/hbm-auth/callback'); // Construct the redirect URL based on the site's domain
+      $settings = \hbm_fetch_pods_act('hbm-auth-server');
+      if ($settings['test_server']) {
+         $sso_server = $settings['test_domain'];
       } else {
-         $redirect_url = $sso_server . '/wp-json/hbm-auth/callback'; // Construct the redirect URL based on the site's domain
+         $sso_server = hbm_get_current_domain() . '/';
       }
-      $userpool_region = get_option("_hbm-cognito-auth-regio");
-      $client_id = get_option("_hbm-{$this->framework_choosen}-auth-client-id");
-      $client_secret = get_option("_hbm-{$this->framework_choosen}-auth-client-secret");
-      $userpool_domain = get_option("_hbm-cognito-auth-userpool-domain");
+      $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/callback'; // Construct the redirect URL based on the site's domain
+      error_log("redirect_url: " . $redirect_url);
+      $userpool_region = $application['cognito_aws_regio'];
+      $client_id = $application['framework_client_id'];
+      $client_secret = $application['framework_client_secret'];
+      $userpool_domain = $application['cognito_userpool'];
 
       // Construct the Cognito token endpoint
       $token_endpoint = "https://{$userpool_domain}.auth.{$userpool_region}.amazoncognito.com/oauth2/token";
