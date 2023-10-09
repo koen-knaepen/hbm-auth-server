@@ -30,16 +30,16 @@ class HBM_Server_Auth_Admin_Shortcodes
         );
         switch ($attributes['slug']) {
             case 'callback':
-                $slug = '/wp-json/hbm-auth/callback';
+                $slug = '/wp-json/hbm-auth-server/callback';
                 break;
             case 'logout':
-                $slug = '/wp-json/hbm-auth/framework_logout';
+                $slug = '/wp-json/hbm-auth-server/framework_logout';
                 break;
             case 'sso':
-                $slug = '/wp-json/hbm-auth/sso_status';
+                $slug = '/wp-json/hbm-auth-server/sso_status';
                 break;
             default:
-                $slug = '/wp-json/hbm-auth/callback';
+                $slug = '/wp-json/hbm-auth-server/callback';
                 break;
         }
         return $domain . $slug;

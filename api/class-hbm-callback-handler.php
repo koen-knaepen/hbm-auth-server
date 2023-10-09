@@ -6,12 +6,16 @@ use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
+use function HBM\hbm_sub_namespace;
+use function HBM\hbm_get_current_domain;
 
 
 require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
 require_once HBM_MAIN_UTIL_PATH . 'helpers.php';
 require_once HBM_MAIN_UTIL_PATH . 'dev-tools.php';
 require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
+require_once HBM_MAIN_UTIL_PATH . 'plugin-utils.php';
+
 
 require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
 // class-hbm-callback-api.php
@@ -54,7 +58,7 @@ class HBM_Callback_Handler
     public function hbm_register_callback_endpoint()
     {
         register_rest_route(
-            'hbm-auth',
+            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/callback',
             array(
                 'methods' => 'GET',
@@ -64,7 +68,7 @@ class HBM_Callback_Handler
         );
 
         register_rest_route(
-            'hbm-auth',
+            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/initiate',
             array(
                 'methods' => 'GET',
@@ -74,7 +78,7 @@ class HBM_Callback_Handler
         );
 
         register_rest_route(
-            'hbm-auth',
+            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/framework_logout',
             array(
                 'methods' => 'GET',
@@ -84,7 +88,7 @@ class HBM_Callback_Handler
         );
 
         register_rest_route(
-            'hbm-auth/v1',
+            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/sso_status',
             array(
                 'methods' => 'GET',
@@ -123,13 +127,21 @@ class HBM_Callback_Handler
         if (empty($code)) {
             return new \WP_Error('no_code', 'No code received', array('status' => 400));
         }
+        $domain = hbm_extract_domain($state_payload->domain);
+        $sites = \hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
+        if (empty($sites)) {
+            return new \WP_Error('no_site', 'No site found', array('status' => 400));
+        }
+        $application = $sites[0]['application'];
+        $framework = $application['app_framework'];
+        $framework_api = HBM_Auth_Framework::get_instance($framework);
 
         // Exchange the authorization code for tokens
-        $tokens = apply_filters('hbm_get_access_code', '', $code, $state_payload->action);
-        $framework_context = apply_filters('hbm_get_framework_context', '');
+        $tokens = $framework_api->exchange_code_for_tokens($code, $application);
+        $framework_context = $framework_api->get_framework_context();
 
         if (isset($tokens['error'])) {
-            return new WP_Error('token_error', $tokens['error'], array('status' => 400));
+            return new \WP_Error('token_error', $tokens['error'], array('status' => 400));
         }
 
         $id_token = $tokens['id_token'];
@@ -144,9 +156,9 @@ class HBM_Callback_Handler
             'action' => $state_payload->action,
             'mode' => $state_payload->mode,
         ) + (array) $framework_user;
-        $verify_token = json_decode($this->secret_manager->encode_jwt($verify_payload, 'hbm-auth-access-'));
+        $verify_token = json_decode(hbm_encode_transient_jwt($verify_payload, 'hbm-auth-access-'));
         $verify_token_urlcoded = urlencode($verify_token->jwt);
-        $redirect_url = "{$state_payload->domain}/wp-json/hbm-auth/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
+        $redirect_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
 
         if ($state_payload->mode == 'test') {
 
@@ -167,16 +179,15 @@ class HBM_Callback_Handler
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
         $domain = hbm_extract_domain($state_payload->domain);
-        error_log('Domain: ' . $domain);
         $sites = \hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
         if (empty($sites)) {
-            return new WP_Error('no_site', 'No site found', array('status' => 400));
+            return new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
-        error_log('Sites: ' . print_r($sites[0]['application'], true));
         $application = $sites[0]['application'];
         $framework = $application['app_framework'];
         $framework_api = HBM_Auth_Framework::get_instance($framework);
-        $redirect_url = $this->get_redirect_url($state_payload->action);
+        $redirect_url = $this->get_redirect_url($state_payload->action, $application);
+        error_log('Redirect URL: ' . $redirect_url);
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
         error_log('Initiate endpoint: ' . $initiate_endpoint);
@@ -208,7 +219,7 @@ class HBM_Callback_Handler
         $state = $current_sso_user['state'];
         $state_payload = hbm_extract_payload($state);
         $mode = $current_sso_user['mode'];
-        $logout_url = "{$state_payload->domain}/wp-json/hbm-auth/v1/logout-client?state={$state}";
+        $logout_url = "{$state_payload->domain}/wp-json/hbm-auth-server/v1/logout-client?state={$state}";
         do_action('hbm_logout_sso_user', $current_sso_user);
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
@@ -245,13 +256,18 @@ class HBM_Callback_Handler
         }
     }
 
-    function get_redirect_url($action)
+    function get_redirect_url($action, $application)
     {
-        $sso_server = get_option('_hbm-auth-sso-server-url');
-        if ($action == 'logout') {
-            $redirect_url = $sso_server . '/wp-json/hbm-auth/framework_logout'; // Construct the logout URL based on the sso server's domain
+        $settings = \hbm_fetch_pods_act('hbm-auth-server');
+        if ($settings['test_server']) {
+            $sso_server = $settings['test_domain'];
         } else {
-            $redirect_url = $sso_server . '/wp-json/hbm-auth/callback'; // Construct the redirect URL based on the sso server's domain
+            $sso_server = hbm_get_current_domain() . '/';
+        }
+        if ($action == 'logout') {
+            $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/framework_logout'; // Construct the logout URL based on the sso server's domain
+        } else {
+            $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/callback'; // Construct the redirect URL based on the sso server's domain
         }
         return $redirect_url;
     }
