@@ -9,6 +9,7 @@ use function HBM\hbm_extract_domain;
 use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
 use function HBM\hbm_encode_transient_jwt;
+use function HBM\hbm_decode_transient_jwt;
 
 
 require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
@@ -156,7 +157,8 @@ class HBM_Callback_Handler
         }
 
         $id_token = $tokens['id_token'];
-        $framework_user = hbm_extract_payload($id_token);
+        $verified_user = hbm_extract_payload($id_token);
+        $framework_user = $framework_api->transform_to_wp_user($verified_user, $state_payload);
         //create a JWT token that can be verified on return
         $site_domain = hbm_get_current_domain();
         $verify_payload = array(
@@ -175,7 +177,8 @@ class HBM_Callback_Handler
 
             $message = "<h3>You are on the SSO Server</h3>"
                 . "<p>Authentication from {$framework_context->label} received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"
-                . "<p>{$framework_context->label} user: </p><pre>" . json_encode($framework_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
+                . "<p>{$framework_context->label} user: </p><pre>" . json_encode($verified_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>'
+                . "<p>WP user: </p><pre>" . json_encode($framework_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
             hbm_echo_modal($redirect_url, $message);
         } else {
             hbm_set_headers();
@@ -189,17 +192,15 @@ class HBM_Callback_Handler
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
+        error_log('state_payload: ' . print_r($state_payload, true));
         $application = $this->get_application($state_payload->domain);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
         $framework_api = $this->init_auth_framework($application);
         $redirect_url = $this->get_redirect_url($state_payload->action, $application);
-        error_log('Redirect URL: ' . $redirect_url);
-        error_log('application: ' . print_r($application, true));
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
-        error_log('Initiate endpoint: ' . $initiate_endpoint);
         if ($state_payload->action == 'logout') {
             do_action(
                 'hbm_set_sso_user',
@@ -221,9 +222,11 @@ class HBM_Callback_Handler
     public function hbm_handle_framework_logout(\WP_REST_Request $request)
     {
         // check the refferer of the request
+        error_log('hbm_handle_framework_logout' . 'using filter hbm_get_sso_user');
         $current_sso_user = apply_filters('hbm_get_sso_user', '');
+        error_log('current_sso_user: ' . print_r($current_sso_user, true));
         if (!isset($current_sso_user['state'])) {
-            return new WP_Error('no_state', 'No state received', array('status' => 400));
+            return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
         $state = $current_sso_user['state'];
         $state_payload = hbm_extract_payload($state);
@@ -245,10 +248,17 @@ class HBM_Callback_Handler
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
+
         $access_code_urlcoded = $request->get_param('access_code');
         $access_code = urldecode($access_code_urlcoded);
-        $framework_user = $this->secret_manager->decode_jwt($access_code);
-        $framework_context = apply_filters('hbm_get_framework_context', '');
+        $framework_user = hbm_decode_transient_jwt($access_code);
+        $application = $this->get_application($state_payload->domain);
+        if (!$application) {
+            new \WP_Error('no_site', 'No site found', array('status' => 400));
+        }
+        $framework_api = $this->init_auth_framework($application);
+
+        $framework_context = $framework_api->get_framework_context();
         $sso_user_urlcoded = $request->get_param('sso_user');
         $sso_user_jwt = urldecode($sso_user_urlcoded);
         $sso_user_received = hbm_extract_payload($sso_user_jwt);

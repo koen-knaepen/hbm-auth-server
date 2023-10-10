@@ -48,7 +48,6 @@ function crb_load()
 {
     if (!class_exists('\Carbon_Fields\Carbon_Fields')) {
         define('Carbon_Fields\URL', trailingslashit(plugin_dir_url(__FILE__)) . 'vendor/htmlburger/carbon-fields/');
-        require_once HBM_PLUGIN_PATH . 'vendor/autoload.php';
         \Carbon_Fields\Carbon_Fields::boot();
     }
 }

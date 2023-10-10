@@ -70,6 +70,6 @@ abstract class HBM_Auth_Framework
 
     abstract public function create_auth_endpoint($action, $redirect_url, $jwt, $application);
     abstract public function exchange_code_for_tokens($code, $application);
-    abstract public function transform_to_wp_user($cognito_user);
+    abstract public function transform_to_wp_user($retrieved_user, $payload);
     // ... other abstract methods ...
 }

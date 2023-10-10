@@ -19,7 +19,7 @@ class HBM_Auth_Admin_Options_Main
         wp_enqueue_script('hbm-deactivate-script', HBM_PLUGIN_URL . '/admin/js/deactivate-script.js', array('jquery'), '1.0.0', true);
 
         // 3. Pass the value to the script for the deactivate script
-        $delete_option = carbon_get_theme_option('hbm-auth-delete-fields-on-deactivate');
+        $delete_option = \get_option('_hbm-auth-delete-fields-on-deactivate');
         wp_localize_script(
             'hbm-deactivate-script',
             'hbmData',

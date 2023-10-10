@@ -2,6 +2,12 @@
 
 namespace HBM\auth_server;
 
+use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
+use Aws\Credentials\Credentials;
+
+require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
+
+
 /**
  * HBM_SSO_User Class
  *
@@ -52,7 +58,30 @@ class HBM_SSO_User
      */
     public function get_sso_user($default_value = null)
     {
-        return $this->sso_user ?: $default_value;
+        $settings = \hbm_fetch_pods_act('hbm-auth-server');
+        error_log('$settings: ' . print_r($settings, true));
+
+        $credentials = new Credentials('<Your-AWS-Access-Key>', '<Your-AWS-Secret-Key>');
+
+        $client = new CognitoIdentityProviderClient([
+            'region' => '<Your-Region>',
+            'version' => 'latest',
+            'credentials' => $credentials
+        ]);
+
+        // Assuming you have saved the JWT token in a session or cookie after login
+        $accessToken = $_SESSION['cognito_access_token']; // or retrieve from cookie
+
+        try {
+            $result = $client->getUser([
+                'AccessToken' => $accessToken
+            ]);
+
+            return $result['Username'];
+        } catch (\Exception $e) {
+            // Handle the error (e.g., user not authenticated, token expired, etc.)
+            return null;
+        }
     }
 
     /**

@@ -113,7 +113,7 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
       return json_decode($body, true);
    }
 
-   public function transform_to_wp_user($cognito_user)
+   public function transform_to_wp_user($cognito_user, $payload)
    {
       $wp_user = array(
          'user_login' => $cognito_user->email,
@@ -124,7 +124,7 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
          'display_name' => $cognito_user->given_name . ' ' . $cognito_user->family_name,
          'role' => 'subscriber',
          'framework' => 'cognito',
-         'domain' => hbm_get_current_domain(),
+         'domain' => $payload->domain,
       );
       return (object) $wp_user;
    }
