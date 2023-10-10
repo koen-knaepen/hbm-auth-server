@@ -192,7 +192,6 @@ class HBM_Callback_Handler
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
-        error_log('state_payload: ' . print_r($state_payload, true));
         $application = $this->get_application($state_payload->domain);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
@@ -222,16 +221,14 @@ class HBM_Callback_Handler
     public function hbm_handle_framework_logout(\WP_REST_Request $request)
     {
         // check the refferer of the request
-        error_log('hbm_handle_framework_logout' . 'using filter hbm_get_sso_user');
         $current_sso_user = apply_filters('hbm_get_sso_user', '');
-        error_log('current_sso_user: ' . print_r($current_sso_user, true));
         if (!isset($current_sso_user['state'])) {
             return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
         $state = $current_sso_user['state'];
         $state_payload = hbm_extract_payload($state);
         $mode = $current_sso_user['mode'];
-        $logout_url = "{$state_payload->domain}/wp-json/hbm-auth-server/v1/logout-client?state={$state}";
+        $logout_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/logout-client?state={$state}";
         do_action('hbm_logout_sso_user', $current_sso_user);
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"

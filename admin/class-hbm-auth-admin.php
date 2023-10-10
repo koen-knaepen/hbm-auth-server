@@ -2,7 +2,6 @@
 
 namespace HBM\auth_server;
 
-require_once HBM_PLUGIN_PATH . 'admin/options/class-options.php'; // Admin-related functionality
 require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
 
 
@@ -15,7 +14,6 @@ require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-
 
 class HBM_Server_Auth_Admin
 {
-    private $admin_options;
     private $admin_shortcodes;
 
     /**
@@ -27,7 +25,6 @@ class HBM_Server_Auth_Admin
     public function __construct()
     {
         if (is_admin()) {
-            $this->admin_options = new HBM_Server_Auth_Admin_Options();
             $this->admin_shortcodes = new HBM_Server_Auth_Admin_Shortcodes();
             add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
         }

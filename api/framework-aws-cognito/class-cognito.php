@@ -34,7 +34,7 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
             break;
          case 'signup':
             $endpoint =
-               "https://{$userpool_sub_domain}.auth.{$userpool_regio}.amazoncognito.com/signup?client_id={$client_id}&response_type=code&response_type=code&scope=email+openid&redirect_uri=http://localhost/wp-json/hbm-auth/v1/callback&state={$jwt}";
+               "https://{$userpool_sub_domain}.auth.{$userpool_regio}.amazoncognito.com/signup?client_id={$client_id}&response_type=code&response_type=code&scope=email+openid&redirect_uri={$redirect_url}&state={$jwt}";
             break;
          case 'logout':
             $endpoint =
