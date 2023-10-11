@@ -2,108 +2,105 @@
 
 namespace HBM\auth_server;
 
-use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
-use Aws\Credentials\Credentials;
+use function HBM\hbm_add_to_session;
 
-require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
+require_once HBM_MAIN_UTIL_PATH . 'redis.php';
 
-
-/**
- * HBM_SSO_User Class
- *
- * This class is responsible for managing Single Sign-On (SSO) user data.
- * It transparently handles the storage and retrieval of user data from the PHP session
- * and provides hooks for other parts of the application to interact with the user data.
- */
 class HBM_SSO_User
 {
-    /**
-     * Stores SSO user data.
-     *
-     * @var array
-     */
-    private $sso_user = array();
 
-    /**
-     * Constructor.
-     *
-     * Initializes the SSO user with a default role of "guest".
-     * Retrieves any existing SSO user data from the session.
-     * Sets up hooks for getting and setting the user data.
-     */
+    private $sso_user_session = null;
+    private $session_id = null;
+
+    private $instance = null;
+
     public function __construct()
     {
-        // Ensure the session is started.
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+
+        $this->session_id = $this->get_session_id();
+        if (!$this->session_id) {
+            $this->sso_user_session = array(
+                'logged_in' => false,
+                'role' => 'guest'
+            );
+        } else {
+            $this->sso_user_session = hbm_get_session($this->session_id);
         }
-
-        // Set default user role.
-        $this->sso_user['role'] = "guest";
-
-        // Retrieve user data from the session, if available.
-        $this->retrieve_from_session();
-
-        // Set up hooks.
-        add_filter('hbm_get_sso_user', array($this, 'get_sso_user'), 10, 1);
-        add_action('hbm_set_sso_user', array($this, 'set_sso_user'), 10, 1);
-        add_action('hbm_logout_sso_user', array($this, 'logout_sso_user'), 10, 0);
     }
 
-    /**
-     * Retrieves the SSO user data.
-     *
-     * @param mixed $default_value Default value to return if no user data is set.
-     * @return array
-     */
-    public function get_sso_user($default_value = null)
+    static function get_instance()
     {
-        return $this->sso_user ?: $default_value;
+        if (!isset(self::$instance)) {
+            self::$instance = new HBM_SSO_User();
+        }
+        return self::$instance;
     }
 
-    /**
-     * Sets the SSO user data.
-     *
-     * Merges the provided user data with the existing data and stores it in the session.
-     *
-     * @param array $sso_user SSO user data to set.
-     */
-    public function set_sso_user($sso_user)
+    public function init($logged_in, $role)
     {
-        error_log('set_sso_user' . print_r($sso_user, true));
-        $this->sso_user = array_merge($this->sso_user, $sso_user);
-        $this->store_to_session();
+        $this->sso_user_session = array(
+            'logged_in' => $logged_in,
+            'role' => $role
+        );
+        $this->session_id =  $this->set_session_id();
+        hbm_add_to_session($this->session_id, $this->sso_user_session);
+    }
+
+    public function get_sso_logout()
+    {
+        return isset($this->sso_user_session['sso_logout']) ? $this->sso_user_session['sso_logout'] : false;
+    }
+
+    public function set_sso_logout($state)
+    {
+        error_log('set_sso_user' . print_r($state, true));
+        if (!$this->session_id) {
+            $this->init(true, 'subscriber');
+        }
+        $this->sso_user_session = hbm_add_to_session($this->session_id, array('sso_logout' => $state));
     }
 
     public function logout_sso_user()
     {
-        $this->sso_user = array(
+        $this->sso_user_session = array(
+            'logged_in' => false,
             'role' => 'guest'
         );
-        $this->store_to_session();
+        hbm_remove_session($this->session_id);
+        $this->remove_session_id();
     }
 
-    /**
-     * Stores the SSO user data to the session.
-     *
-     * This method is automatically called when setting user data to ensure
-     * the session always reflects the current state of the user data.
-     */
     private function store_to_session()
     {
-        $_SESSION['hbm_sso_user'] = $this->sso_user;
+        $this->redis->set('hbm_sso_user', $this->sso_user_session);
     }
 
-    /**
-     * Retrieves the SSO user data from the session.
-     *
-     * This method is automatically called during class instantiation to
-     * populate the user data from any existing session data.
-     */
     private function retrieve_from_session()
     {
-        if (isset($_SESSION['hbm_sso_user'])) {
-            $this->sso_user = $_SESSION['hbm_sso_user'];
+        $storedData = $this->redis->get('hbm_sso_user');
+        if ($storedData) {
+            $this->sso_user_session = $storedData;
         }
+    }
+
+    private function get_session_id()
+    {
+        $cookie = false;
+        if (isset($_COOKIE['hbm_sso_user'])) {
+            $cookie = \wp_unslash($_COOKIE['hbm_sso_user']);
+        }
+        return $cookie;
+    }
+
+    private function set_session_id($ttl = 3600)
+    {
+        $session_id = uniqid();
+        setcookie('hbm_sso_user', $session_id, time() + $ttl, '/', '', false, true);
+        return $session_id;
+    }
+
+    private function remove_session_id()
+    {
+        setcookie('hbm_sso_user', '', time() - 3600, '/', '', false, true);
     }
 }
