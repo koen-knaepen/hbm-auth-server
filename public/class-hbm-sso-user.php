@@ -2,21 +2,20 @@
 
 namespace HBM\auth_server;
 
-use function HBM\hbm_add_to_session;
-
 require_once HBM_MAIN_UTIL_PATH . 'redis.php';
 
-class HBM_SSO_User
+class HBM_SSO_User_Session
 {
 
     private $sso_user_session = null;
     private $session_id = null;
+    private $application = null;
 
-    private $instance = null;
+    static protected $instances = null;
 
-    public function __construct()
+    public function __construct($application)
     {
-
+        $this->application = $application;
         $this->session_id = $this->get_session_id();
         if (!$this->session_id) {
             $this->sso_user_session = array(
@@ -24,16 +23,16 @@ class HBM_SSO_User
                 'role' => 'guest'
             );
         } else {
-            $this->sso_user_session = hbm_get_session($this->session_id);
+            $this->sso_user_session = \hbm_get_session($this->session_id);
         }
     }
 
-    static function get_instance()
+    static function get_instance($application)
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new HBM_SSO_User();
+        if (!isset(self::$instances[$application])) {
+            self::$instances[$application] = new HBM_SSO_User_Session($application);
         }
-        return self::$instance;
+        return self::$instances[$application];
     }
 
     public function init($logged_in, $role)
@@ -43,9 +42,16 @@ class HBM_SSO_User
             'role' => $role
         );
         $this->session_id =  $this->set_session_id();
-        hbm_add_to_session($this->session_id, $this->sso_user_session);
+        \hbm_add_to_session($this->session_id, $this->sso_user_session);
     }
 
+    public function set_sso_user($user)
+    {
+        if (!$this->session_id) {
+            $this->init(true, 'subscriber');
+        }
+        $this->sso_user_session = \hbm_add_to_session($this->session_id, $user);
+    }
     public function get_sso_logout()
     {
         return isset($this->sso_user_session['sso_logout']) ? $this->sso_user_session['sso_logout'] : false;
@@ -53,11 +59,10 @@ class HBM_SSO_User
 
     public function set_sso_logout($state)
     {
-        error_log('set_sso_user' . print_r($state, true));
         if (!$this->session_id) {
             $this->init(true, 'subscriber');
         }
-        $this->sso_user_session = hbm_add_to_session($this->session_id, array('sso_logout' => $state));
+        $this->sso_user_session = \hbm_add_to_session($this->session_id, array('sso_logout' => $state));
     }
 
     public function logout_sso_user()
@@ -66,28 +71,15 @@ class HBM_SSO_User
             'logged_in' => false,
             'role' => 'guest'
         );
-        hbm_remove_session($this->session_id);
+        \hbm_remove_session($this->session_id);
         $this->remove_session_id();
-    }
-
-    private function store_to_session()
-    {
-        $this->redis->set('hbm_sso_user', $this->sso_user_session);
-    }
-
-    private function retrieve_from_session()
-    {
-        $storedData = $this->redis->get('hbm_sso_user');
-        if ($storedData) {
-            $this->sso_user_session = $storedData;
-        }
     }
 
     private function get_session_id()
     {
         $cookie = false;
-        if (isset($_COOKIE['hbm_sso_user'])) {
-            $cookie = \wp_unslash($_COOKIE['hbm_sso_user']);
+        if (isset($_COOKIE["hbm_sso_user-{$this->application}"])) {
+            $cookie = \wp_unslash($_COOKIE["hbm_sso_user-{$this->application}"]);
         }
         return $cookie;
     }
@@ -95,12 +87,37 @@ class HBM_SSO_User
     private function set_session_id($ttl = 3600)
     {
         $session_id = uniqid();
-        setcookie('hbm_sso_user', $session_id, time() + $ttl, '/', '', false, true);
+        setcookie("hbm_sso_user-{$this->application}",  $session_id, time() + $ttl, '/', '', false, true);
         return $session_id;
     }
 
     private function remove_session_id()
     {
-        setcookie('hbm_sso_user', '', time() - 3600, '/', '', false, true);
+        setcookie("hbm_sso_user-{$this->application}", '', time() - 3600, '/', '', false, true);
     }
+}
+
+function hbm_set_logout($application, $state)
+{
+    $instance =  HBM_SSO_User_Session::get_instance($application);
+    $instance->set_sso_logout($state);
+}
+
+function hbm_get_logout($application)
+{
+
+    $instance =  HBM_SSO_User_Session::get_instance($application);
+    return $instance->get_sso_logout();
+}
+
+function hbm_logout($application)
+{
+    $instance =  HBM_SSO_User_Session::get_instance($application);
+    $instance->logout_sso_user();
+}
+
+function hbm_set_sso_user($application, $user)
+{
+    $instance =  HBM_SSO_User_Session::get_instance($application);
+    $instance->set_sso_user($user);
 }

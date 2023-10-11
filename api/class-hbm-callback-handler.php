@@ -10,6 +10,7 @@ use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
 use function HBM\hbm_encode_transient_jwt;
 use function HBM\hbm_decode_transient_jwt;
+use function HBM\hbm_get_visit;
 
 
 require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
@@ -17,8 +18,10 @@ require_once HBM_MAIN_UTIL_PATH . 'helpers.php';
 require_once HBM_MAIN_UTIL_PATH . 'dev-tools.php';
 require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
 require_once HBM_MAIN_UTIL_PATH . 'plugin-utils.php';
+require_once HBM_MAIN_UTIL_PATH . 'gatekeeper.php';
 
 
+require_once HBM_PLUGIN_PATH . 'public/class-hbm-sso-user.php';
 require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
 // class-hbm-callback-api.php
 /**
@@ -78,7 +81,7 @@ class HBM_Callback_Handler
             '/callback',
             array(
                 'methods' => 'GET',
-                'callback' => array($this, 'hbm_handle_callback'),
+                'callback' => array($this, 'handle_callback'),
                 'permission_callback' => '__return_true'
             )
         );
@@ -88,7 +91,7 @@ class HBM_Callback_Handler
             '/initiate',
             array(
                 'methods' => 'GET',
-                'callback' => array($this, 'hbm_initiate_callback'),
+                'callback' => array($this, 'initiate_callback'),
                 'permission_callback' => '__return_true'
             )
         );
@@ -98,7 +101,7 @@ class HBM_Callback_Handler
             '/framework_logout',
             array(
                 'methods' => 'GET',
-                'callback' => array($this, 'hbm_handle_framework_logout'),
+                'callback' => array($this, 'handle_framework_logout'),
                 'permission_callback' => '__return_true'
             )
         );
@@ -108,7 +111,7 @@ class HBM_Callback_Handler
             '/sso_status',
             array(
                 'methods' => 'GET',
-                'callback' => array($this, 'hbm_set_sso'),
+                'callback' => array($this, 'callback_set_sso'),
                 'permission_callback' => '__return_true'
             )
         );
@@ -131,7 +134,7 @@ class HBM_Callback_Handler
      * @return WP_Error|WP_REST_Response The response object
      * 
      */
-    public function hbm_handle_callback(\WP_REST_Request $request)
+    public function handle_callback(\WP_REST_Request $request)
     {
         // Get the authorization code from Framework
         // $this->log_request($request);
@@ -169,7 +172,7 @@ class HBM_Callback_Handler
             'action' => $state_payload->action,
             'mode' => $state_payload->mode,
         ) + (array) $framework_user;
-        $verify_token = json_decode(hbm_encode_transient_jwt($verify_payload, 'hbm-auth-access-'));
+        $verify_token = json_decode(hbm_encode_transient_jwt($verify_payload, '', 'hbm-auth-access-'));
         $verify_token_urlcoded = urlencode($verify_token->jwt);
         $redirect_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
 
@@ -187,8 +190,13 @@ class HBM_Callback_Handler
     }
 
 
-    public function hbm_initiate_callback(\WP_REST_Request $request)
+    public function initiate_callback(\WP_REST_Request $request)
     {
+        error_log("entry visit in class auth server: " . print_r(hbm_get_visit(), true));
+        if (defined('REST_REQUEST') && \REST_REQUEST) {
+            error_log(" REST_REQUEST is defined and true" . print_r(\REST_REQUEST, true));
+        }
+
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = hbm_extract_payload($state);
@@ -201,12 +209,7 @@ class HBM_Callback_Handler
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
         if ($state_payload->action == 'logout') {
-            do_action(
-                'hbm_set_sso_user',
-                array(
-                    'state' => $state_urlcoded,
-                )
-            );
+            hbm_set_logout($application['application_uid'], $state_urlcoded);
         }
         if ($state_payload->mode == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"
@@ -218,21 +221,23 @@ class HBM_Callback_Handler
         }
     }
 
-    public function hbm_handle_framework_logout(\WP_REST_Request $request)
+    public function handle_framework_logout(\WP_REST_Request $request)
     {
-        // check the refferer of the request
-        $current_sso_user = apply_filters('hbm_get_sso_user', '');
-        if (!isset($current_sso_user['state'])) {
+        $application = $request->get_param('app');
+        if (!isset($application)) {
+            return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
+        }
+        $state = hbm_get_logout($application);
+        if (!isset($state)) {
             return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
-        $state = $current_sso_user['state'];
         $state_payload = hbm_extract_payload($state);
-        $mode = $current_sso_user['mode'];
+        $mode = $state_payload->mode;
         $logout_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/logout-client?state={$state}";
-        do_action('hbm_logout_sso_user', $current_sso_user);
+        hbm_logout($application);
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
-                . "<p>Logout request received: </p><pre>" . json_encode($current_sso_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
+                . "<p>Logout request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
             hbm_echo_modal($logout_url, $message);
         } else {
             hbm_set_headers();
@@ -240,7 +245,7 @@ class HBM_Callback_Handler
         }
     }
 
-    public function hbm_set_sso(\WP_REST_Request $request)
+    public function callback_set_sso(\WP_REST_Request $request)
     {
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
@@ -260,8 +265,7 @@ class HBM_Callback_Handler
         $sso_user_jwt = urldecode($sso_user_urlcoded);
         $sso_user_received = hbm_extract_payload($sso_user_jwt);
         $sso_user = array_merge((array) $sso_user_received, (array) $state_payload);
-        do_action('hbm_set_sso_user', $sso_user);
-
+        hbm_set_sso_user($application['application_uid'], $sso_user);
         if ($state_payload->mode == 'test') {
 
             $message = "<h3>You are BACK on the SSO Server</h3>"
@@ -281,7 +285,7 @@ class HBM_Callback_Handler
             $sso_server = hbm_get_current_domain() . '/';
         }
         if ($action == 'logout') {
-            $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/framework_logout'; // Construct the logout URL based on the sso server's domain
+            $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/framework_logout?app=' . $application['application_uid']; // Construct the logout URL based on the sso server's domain
         } else {
             $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/callback'; // Construct the redirect URL based on the sso server's domain
         }

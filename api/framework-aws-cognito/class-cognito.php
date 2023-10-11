@@ -39,6 +39,7 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
          case 'logout':
             $endpoint =
                "https://{$userpool_sub_domain}.auth.{$userpool_regio}.amazoncognito.com/logout?client_id={$client_id}&logout_uri={$redirect_url}";
+            // "https://{$userpool_sub_domain}.auth.{$userpool_regio}.amazoncognito.com/logout?client_id={$client_id}&response_type=code&response_type=code&scope=email+openid+profile&redirect_uri={$redirect_url}&state={$jwt}";
             break;
          default:
             break;
@@ -56,7 +57,6 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
          $sso_server = hbm_get_current_domain() . '/';
       }
       $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/callback'; // Construct the redirect URL based on the site's domain
-      error_log("redirect_url: " . $redirect_url);
       $userpool_region = $application['cognito_aws_regio'];
       $client_id = $application['framework_client_id'];
       $client_secret = $application['framework_client_secret'];
