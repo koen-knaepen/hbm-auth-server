@@ -19,7 +19,7 @@ class HBM_Server_Auth_Admin_Shortcodes
         if ($specific_domain) {
             $domain = pods('hbm-auth-server')->field('hbm_auth_server_test_domain');
         } else {
-            $domain = get_site_url();
+            $domain = get_site_url() . '/';
         }
         $attributes = shortcode_atts(
             array(
@@ -30,18 +30,21 @@ class HBM_Server_Auth_Admin_Shortcodes
         );
         switch ($attributes['slug']) {
             case 'callback':
-                $slug = '/wp-json/hbm-auth-server/callback';
+                $slug = 'wp-json/hbm-auth-server/callback';
                 break;
             case 'logout':
-                $slug = '/wp-json/hbm-auth-server/framework_logout';
+                $slug = 'wp-json/hbm-auth-server/framework_logout';
+                break;
+            case 'logout-long':
+                $slug = 'wp-json/hbm-auth-server/framework_logout?app=';
                 break;
             case 'sso':
-                $slug = '/wp-json/hbm-auth-server/sso_status';
+                $slug = 'wp-json/hbm-auth-server/sso_status';
                 break;
             default:
-                $slug = '/wp-json/hbm-auth-server/callback';
+                $slug = 'wp-json/hbm-auth-server/callback';
                 break;
         }
-        return $domain . $slug;
+        return  $domain . $slug;
     }
 }

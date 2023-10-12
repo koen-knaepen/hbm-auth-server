@@ -1,0 +1,1063 @@
+{
+    "@meta": {
+        "version": "3.0.6",
+        "build": 1697101847
+    },
+    "pods": [
+        {
+            "name": "hbm-auth-server-application",
+            "id": 481,
+            "label": "HBM Applications",
+            "description": "",
+            "type": "pod",
+            "storage": "table",
+            "label_singular": "Application",
+            "public": "1",
+            "show_ui": "1",
+            "pod_index": "name",
+            "_migrated_28": "1",
+            "ui_style": "post_type",
+            "show_in_menu": "1",
+            "use_submenu_fallback": "1",
+            "menu_position": "0",
+            "ui_actions_enabled": [
+                "add",
+                "edit",
+                "duplicate",
+                "delete"
+            ],
+            "ui_reorder_field": "menu_order",
+            "ui_fields_manage": [
+                "name",
+                "modified"
+            ],
+            "menu_icon": "dashicons-admin-site-alt3",
+            "pick_object": "custom-simple",
+            "unique": "0",
+            "required": "0",
+            "label_add_new": "Register",
+            "label_add_new_item": "Register New",
+            "menu_location_custom": "pods-settings-hbm-auth-server",
+            "hierarchical": "0",
+            "pod_parent": "parent",
+            "groups": [
+                {
+                    "name": "setting",
+                    "id": 482,
+                    "label": "Framework Settings",
+                    "description": "",
+                    "weight": 0,
+                    "roles_allowed": "administrator",
+                    "admin_only": "1",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "id": 484,
+                            "label": "Name",
+                            "description": "",
+                            "weight": 0,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "1",
+                            "unique": "1",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "15",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "text_trim": "1",
+                            "admin_only": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "name",
+                                        "compare": "=",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "application_uid",
+                            "id": 543,
+                            "label": "Application UID",
+                            "description": "",
+                            "weight": 1,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "read_only": "1",
+                            "hidden": "1"
+                        },
+                        {
+                            "name": "created",
+                            "id": 485,
+                            "label": "Date Created",
+                            "description": "",
+                            "weight": 2,
+                            "type": "datetime",
+                            "sister_id": "-- Select One --",
+                            "datetime_format": "ymd_slash",
+                            "datetime_time_type": "24",
+                            "datetime_time_format": "h_mm_ss_A",
+                            "required": "0",
+                            "unique": "0",
+                            "datetime_type": "format",
+                            "datetime_time_format_24": "hh_mm",
+                            "datetime_allow_empty": "1",
+                            "datetime_html5": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "read_only": "1"
+                        },
+                        {
+                            "name": "modified",
+                            "id": 486,
+                            "label": "Date Modified",
+                            "description": "",
+                            "weight": 3,
+                            "type": "datetime",
+                            "datetime_format": "ymd_slash",
+                            "datetime_time_type": "12",
+                            "datetime_time_format": "h_mm_ss_A"
+                        },
+                        {
+                            "name": "app_framework",
+                            "id": 487,
+                            "label": "Framework",
+                            "description": "Indicate what the framework for authentication and SSO is you want to use.",
+                            "weight": 4,
+                            "type": "pick",
+                            "pick_object": "custom-simple",
+                            "sister_id": "-- Select One --",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "pick_format_type": "single",
+                            "pick_format_single": "radio",
+                            "pick_format_multi": "list",
+                            "pick_display_format_multi": "default",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "1",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "1",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "pick_custom": "cognito|AWS Cognito\nentra|Microsoft Entra",
+                            "default_value": "cognito",
+                            "admin_only": "1"
+                        },
+                        {
+                            "name": "application_uid_readonly",
+                            "id": 544,
+                            "label": "Logout URL for this application",
+                            "description": "This is the ID, you should use in the Logout URLS.",
+                            "weight": 5,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "html_content": "[hbm_copy_wrapper]<strong>[hbm_callback_url slug=\"logout-long\"][hbm_this_pod field=\"application_uid\"]<\/strong>[\/hbm_copy_wrapper]",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "html_trim": "1",
+                            "html_allow_shortcode": "1",
+                            "html_trim_extra_lines": "1",
+                            "html_trim_p_brs": "1",
+                            "html_oembed": "0",
+                            "html_wptexturize": "1",
+                            "html_wpautop": "1"
+                        },
+                        {
+                            "name": "cognito_userpool",
+                            "id": 488,
+                            "label": "Cognito Userpool",
+                            "description": "Give the subdomain (first part) of the Cognito User Pool you want to use",
+                            "weight": 6,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "text_trim": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "app_framework",
+                                        "compare": "=",
+                                        "value": "cognito"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "cognito_aws_regio",
+                            "id": 489,
+                            "label": "AWS Regio",
+                            "description": "Give the technical name of the AWS regio where the User Pool is hosted",
+                            "weight": 7,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "text_trim": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "app_framework",
+                                        "compare": "=",
+                                        "value": "cognito"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "entra_tenant_name",
+                            "id": 490,
+                            "label": "Tenant Name",
+                            "description": "Give the name of the Tenant in Entra you want to use",
+                            "weight": 8,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "app_framework",
+                                        "compare": "=",
+                                        "value": "entra"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "framework_client_id",
+                            "id": 491,
+                            "label": "Application (Client) ID",
+                            "description": "Give your client ID from the application in Cognito you want to use",
+                            "weight": 9,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "hbm_auth_app_framework",
+                                        "compare": "=",
+                                        "value": "cognito"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "framework_client_secret",
+                            "id": 492,
+                            "label": "Client Secret",
+                            "description": "Copy the secret you want to use from the application in cognito and paste it here",
+                            "weight": 10,
+                            "type": "password",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "password_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0"
+                        },
+                        {
+                            "name": "entra_signup_policy",
+                            "id": 493,
+                            "label": "Signup Policy",
+                            "description": "Give the name of the policy in Entra you want to use to sign up",
+                            "weight": 11,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "app_framework",
+                                        "compare": "=",
+                                        "value": "entra"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "entra_login_policy",
+                            "id": 494,
+                            "label": "Login Policy",
+                            "description": "Give the name of the policy in Entra you want to use to login",
+                            "weight": 12,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "app_framework",
+                                        "compare": "=",
+                                        "value": "entra"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "entra_editprofile_policy",
+                            "id": 495,
+                            "label": "Edit Profile Policy",
+                            "description": "Give the name of the policy in Entra you want to use to edit the profile",
+                            "weight": 13,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "app_framework",
+                                        "compare": "=",
+                                        "value": "entra"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "client_sites",
+                    "id": 483,
+                    "label": "Client Sites",
+                    "description": "",
+                    "weight": 1,
+                    "roles_allowed": "administrator",
+                    "admin_only": "1",
+                    "fields": [
+                        {
+                            "name": "registered_client_sites",
+                            "id": 496,
+                            "label": "Registered Client Sites",
+                            "description": "All sites (domains) that can use this application for user management",
+                            "weight": 0,
+                            "type": "pick",
+                            "pick_object": "pod",
+                            "pick_val": "hbm-auth-server-site",
+                            "sister_id": "36",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "pick_format_type": "multi",
+                            "pick_format_single": "dropdown",
+                            "pick_format_multi": "list",
+                            "pick_display_format_multi": "non_serial",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "1",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "0",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "pick_add_new_label": "Register new client (sub)domain"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "hbm-auth-server",
+            "id": 497,
+            "label": "HBM Auth Server",
+            "description": "",
+            "type": "settings",
+            "storage": "none",
+            "public": "1",
+            "show_ui": "1",
+            "menu_name": "HBM Auth Server",
+            "menu_location": "top",
+            "_migrated_28": "1",
+            "ui_style": "settings",
+            "menu_position": "2",
+            "pick_object": "custom-simple",
+            "required": "0",
+            "menu_icon": "dashicons-admin-site-alt3",
+            "groups": [
+                {
+                    "name": "configuration",
+                    "id": 498,
+                    "label": "Configuration",
+                    "description": "",
+                    "weight": 0,
+                    "roles_allowed": "administrator",
+                    "fields": [
+                        {
+                            "name": "cognito_access_key",
+                            "id": 540,
+                            "label": "Cognito Access Key",
+                            "description": "Give the access Key for the user with the correct Cognito Access",
+                            "weight": 0,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0"
+                        },
+                        {
+                            "name": "cognito_secret_key",
+                            "id": 541,
+                            "label": "Cognito Secret Key",
+                            "description": "Give the secret Key for the Cognito user with the correct access.",
+                            "weight": 1,
+                            "type": "password",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "password_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0"
+                        },
+                        {
+                            "name": "redirect_url",
+                            "id": 501,
+                            "label": "Redirect URL",
+                            "description": "This is the redirect url used to login and signup or change profile with the framework.",
+                            "weight": 2,
+                            "type": "html",
+                            "sister_id": "36",
+                            "required": "0",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "html_content": "[hbm_copy_wrapper][hbm_callback_url][\/hbm_copy_wrapper]",
+                            "html_trim": "1",
+                            "html_oembed": "1",
+                            "html_wptexturize": "1",
+                            "html_convert_chars": "1",
+                            "html_wpautop": "1",
+                            "html_allow_shortcode": "1"
+                        },
+                        {
+                            "name": "logout_url",
+                            "id": 502,
+                            "label": "Logout URL",
+                            "description": "This is the logout url used to logout users explicitely by the framework.",
+                            "weight": 3,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "html_content": "[hbm_copy_wrapper][hbm_callback_url slug=\"logout\"][\/hbm_copy_wrapper]",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "html_allow_shortcode": "1"
+                        },
+                        {
+                            "name": "sso_url",
+                            "id": 503,
+                            "label": "SSO Server Redirect URL",
+                            "description": "This is the redirect url used after framework operations.",
+                            "weight": 4,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "html_content": "[hbm_copy_wrapper][hbm_callback_url slug=\"sso\"][\/hbm_copy_wrapper]",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "html_allow_shortcode": "1"
+                        }
+                    ]
+                },
+                {
+                    "name": "hbm_auth_server_test_parameters",
+                    "id": 499,
+                    "label": "Test Parameters",
+                    "description": "",
+                    "weight": 1,
+                    "roles_allowed": "administrator",
+                    "fields": [
+                        {
+                            "name": "test_server",
+                            "id": 504,
+                            "label": "Use specific test server?",
+                            "description": "Check if you want to use another server for test purposes than the current domain.",
+                            "weight": 0,
+                            "type": "pick",
+                            "pick_object": "custom-simple",
+                            "sister_id": "-- Select One --",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "pick_format_type": "multi",
+                            "pick_format_single": "dropdown",
+                            "pick_format_multi": "checkbox",
+                            "pick_display_format_multi": "default",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "1",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "1",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "pick_custom": "1|Yes"
+                        },
+                        {
+                            "name": "test_domain",
+                            "id": 505,
+                            "label": "Test Server Domain",
+                            "description": "Give the name of the test server you want to use (localhost or other)",
+                            "weight": 1,
+                            "type": "website",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "website_format": "normal",
+                            "website_allow_port": "0",
+                            "website_clickable": "0",
+                            "website_new_window": "0",
+                            "website_nofollow": "0",
+                            "website_max_length": "255",
+                            "website_html5": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "admin_only": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "test_server",
+                                        "compare": "not-empty",
+                                        "value": "1"
+                                    }
+                                ]
+                            },
+                            "website_placeholder": "localhost"
+                        }
+                    ]
+                },
+                {
+                    "name": "hbm_auth_server_plugin_management",
+                    "id": 500,
+                    "label": "Plugin Management",
+                    "description": "",
+                    "weight": 2,
+                    "roles_allowed": "administrator",
+                    "fields": [
+                        {
+                            "name": "plugin_deactivation",
+                            "id": 506,
+                            "label": "On plugin deactivation",
+                            "description": "Delete the databases and field upon deactivation",
+                            "weight": 0,
+                            "type": "pick",
+                            "pick_object": "custom-simple",
+                            "sister_id": "-- Select One --",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "pick_format_type": "multi",
+                            "pick_format_single": "dropdown",
+                            "pick_format_multi": "checkbox",
+                            "pick_display_format_multi": "default",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "1",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "1",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "pick_custom": "1|Delete"
+                        },
+                        {
+                            "name": "plugin_removal",
+                            "id": 507,
+                            "label": "On plugin removal",
+                            "description": "Delete the databases and field upon removal",
+                            "weight": 1,
+                            "type": "pick",
+                            "pick_object": "custom-simple",
+                            "sister_id": "-- Select One --",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "pick_format_type": "multi",
+                            "pick_format_single": "dropdown",
+                            "pick_format_multi": "checkbox",
+                            "pick_display_format_multi": "default",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "1",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "1",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "pick_custom": "1|Delete"
+                        },
+                        {
+                            "name": "automatic_updates",
+                            "id": 508,
+                            "label": "Automatic Updates",
+                            "description": "If checked the latest pods package for HBM Auth Server is update when available",
+                            "weight": 2,
+                            "type": "pick",
+                            "pick_object": "custom-simple",
+                            "sister_id": "-- Select One --",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "pick_format_type": "multi",
+                            "pick_format_single": "dropdown",
+                            "pick_format_multi": "checkbox",
+                            "pick_display_format_multi": "default",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "1",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "1",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "pick_custom": "1|Yes",
+                            "admin_only": "1"
+                        },
+                        {
+                            "name": "initial_pods_package",
+                            "id": 509,
+                            "label": "Initial PODS Package",
+                            "description": "The file used for initialization or update of HBM Server used PODS.",
+                            "weight": 3,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "automatic_updates",
+                                        "compare": "not-empty",
+                                        "value": ""
+                                    }
+                                ]
+                            },
+                            "hidden": "0",
+                            "read_only": "1"
+                        },
+                        {
+                            "name": "pods_package_checksum",
+                            "id": 510,
+                            "label": "PODS Package Checksum",
+                            "description": "Checksum used to control if there is a newer version of the PODS package",
+                            "weight": 4,
+                            "type": "text",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "text_allowed_html_tags": "strong em a ul ol li b i",
+                            "text_max_length": "255",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "read_only": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "automatic_updates",
+                                        "compare": "not-empty",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "hbm-auth-server-site",
+            "id": 511,
+            "label": "HBM Sites",
+            "description": "",
+            "type": "pod",
+            "storage": "table",
+            "label_singular": "Site",
+            "public": "1",
+            "show_ui": "1",
+            "pod_index": "name",
+            "_migrated_28": "0",
+            "pick_object": "custom-simple",
+            "unique": "0",
+            "ui_style": "post_type",
+            "show_in_menu": "1",
+            "use_submenu_fallback": "0",
+            "menu_location_custom": "pods-settings-hbm-auth-server",
+            "menu_position": "0",
+            "ui_actions_enabled": [
+                "add",
+                "edit",
+                "duplicate",
+                "delete"
+            ],
+            "ui_reorder_field": "menu_order",
+            "ui_fields_manage": [
+                "name",
+                "modified"
+            ],
+            "ui_filters": [
+                "application"
+            ],
+            "menu_icon": "dashicons-star-empty",
+            "hierarchical": "0",
+            "pod_parent": "parent",
+            "required": "0",
+            "groups": [
+                {
+                    "name": "details",
+                    "id": 512,
+                    "label": "Details",
+                    "description": "",
+                    "weight": 0,
+                    "fields": [
+                        {
+                            "name": "name",
+                            "id": 513,
+                            "label": "Site",
+                            "description": "",
+                            "weight": 0,
+                            "type": "website",
+                            "sister_id": "-- Select One --",
+                            "required": "1",
+                            "unique": "1",
+                            "website_format": "no-http",
+                            "website_allow_port": "0",
+                            "website_clickable": "1",
+                            "website_new_window": "1",
+                            "website_nofollow": "1",
+                            "website_max_length": "255",
+                            "website_html5": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "name",
+                                        "compare": "=",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "created",
+                            "id": 514,
+                            "label": "Date Created",
+                            "description": "",
+                            "weight": 1,
+                            "type": "datetime",
+                            "datetime_format": "ymd_slash",
+                            "datetime_time_type": "12",
+                            "datetime_time_format": "h_mm_ss_A"
+                        },
+                        {
+                            "name": "modified",
+                            "id": 515,
+                            "label": "Date Modified",
+                            "description": "",
+                            "weight": 2,
+                            "type": "datetime",
+                            "datetime_format": "ymd_slash",
+                            "datetime_time_type": "12",
+                            "datetime_time_format": "h_mm_ss_A"
+                        },
+                        {
+                            "name": "application",
+                            "id": 516,
+                            "label": "Application",
+                            "description": "",
+                            "weight": 3,
+                            "type": "pick",
+                            "pick_object": "pod",
+                            "pick_val": "hbm-auth-server-application",
+                            "sister_id": "38",
+                            "pick_table": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "pick_format_type": "single",
+                            "pick_format_single": "dropdown",
+                            "pick_format_multi": "list",
+                            "pick_display_format_multi": "default",
+                            "pick_display_format_separator": ", ",
+                            "pick_allow_add_new": "0",
+                            "pick_taggable": "0",
+                            "pick_show_icon": "1",
+                            "pick_show_edit_link": "1",
+                            "pick_show_view_link": "1",
+                            "pick_limit": "0",
+                            "pick_user_role": "Administrator",
+                            "pick_post_status": "publish",
+                            "pick_post_author": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "0"
+                        },
+                        {
+                            "name": "test_buttons",
+                            "id": 517,
+                            "label": "Test Buttons",
+                            "description": "Test button will appear upon save",
+                            "weight": 4,
+                            "type": "heading",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "name",
+                                        "compare": "not-empty",
+                                        "value": ""
+                                    }
+                                ]
+                            },
+                            "heading_tag": "h3"
+                        },
+                        {
+                            "name": "test_sign_up",
+                            "id": 518,
+                            "label": "Test Sign Up",
+                            "description": "Click this button to test signup workflow.",
+                            "weight": 5,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "html_content": "<button type=\"button\" id=\"signupBtn\" class=\"button button-primary\" data-hbm-auth='{\"mode\":\"test\", \"action\":\"signup\" }'>Sign Up from Auth Server<\/button>",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "html_allow_shortcode": "1",
+                            "admin_only": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "name",
+                                        "compare": "not-empty",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "test_login",
+                            "id": 519,
+                            "label": "Test Login",
+                            "description": "Click this button to test login workflow.",
+                            "weight": 6,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "html_content": "<button type=\"button\" id=\"loginBtn\" class=\"button button-primary\" data-hbm-auth='{\"mode\":\"test\", \"action\":\"login\" }'>Login from Auth Server<\/button>",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "html_allow_shortcode": "1",
+                            "admin_only": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "name",
+                                        "compare": "not-empty",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "test_logout",
+                            "id": 520,
+                            "label": "Test Logout",
+                            "description": "Click this button to test logout workflow.",
+                            "weight": 7,
+                            "type": "html",
+                            "sister_id": "-- Select One --",
+                            "required": "0",
+                            "unique": "0",
+                            "html_content": "<button type=\"button\" id=\"logoutBtn\" class=\"button button-primary\" data-hbm-auth='{\"mode\":\"test\", \"action\":\"logout\" , \"display\": \"new-window\"}'>Logout from Auth Server<\/button>",
+                            "html_no_label": "0",
+                            "repeatable": "0",
+                            "repeatable_format": "default",
+                            "roles_allowed": "administrator",
+                            "enable_conditional_logic": "1",
+                            "html_allow_shortcode": "1",
+                            "admin_only": "1",
+                            "conditional_logic": {
+                                "action": "show",
+                                "logic": "any",
+                                "rules": [
+                                    {
+                                        "field": "name",
+                                        "compare": "not-empty",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
