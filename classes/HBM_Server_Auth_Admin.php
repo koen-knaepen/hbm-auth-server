@@ -4,9 +4,9 @@ namespace HBM\auth_server;
 
 use function HBM\hbm_create_uuid;
 
-require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
-require_once HBM_MAIN_UTIL_PATH . 'helpers.php'; // Helper functions
-require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
+// require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
+// require_once HBM_MAIN_UTIL_PATH . 'helpers.php'; // Helper functions
+// // require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
 
 
 /**

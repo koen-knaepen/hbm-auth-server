@@ -2,7 +2,7 @@
 
 namespace HBM\auth_server;
 
-require_once HBM_PLUGIN_PATH . 'api/framework-aws-cognito/class-cognito.php';
+// require_once HBM_PLUGIN_PATH . 'api/framework-aws-cognito/class-cognito.php';
 
 abstract class HBM_Auth_Framework
 {

@@ -25,6 +25,9 @@ if (!defined('ABSPATH')) {
     die("You are not supposed to be here");
 }
 
+// start with enabling autoloading
+require_once \WP_PLUGIN_DIR . '/hbm-main/vendor/autoload.php';
+
 // HBM_MAIN_UTIL_PATH is a global constant defined to get access to the main utilities.
 if (!defined('HBM_MAIN_UTIL_PATH')) define('HBM_MAIN_UTIL_PATH', \WP_PLUGIN_DIR . '/hbm-main/main-utility/');
 
@@ -34,13 +37,12 @@ if (!defined('HBM_MAIN_UTIL_PATH')) define('HBM_MAIN_UTIL_PATH', \WP_PLUGIN_DIR 
 // HBM_PLUGIN_PATH, HBM_PLUGIN_URL
 // HBM_PLUGIN_FILE, HBM_PLUGIN_BASENAME
 // HBM_PLUGIN_NAME, HBM_PLUGIN_VERSION
-require_once \HBM_MAIN_UTIL_PATH .  'main-utils.php'; // Constants class
+// require_once \HBM_MAIN_UTIL_PATH .  'main-utils.php'; // Constants class
 
 hbm_init_constants(__NAMESPACE__, __FILE__);
 
 // Include necessary files
-require_once HBM_PLUGIN_PATH . 'admin/log-script-server.php'; // Logging functionality
-require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth-server.php'; // Main plugin class
+// require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth-server.php'; // Main plugin class
 
 
 // Initialize the main plugin class

@@ -2,7 +2,7 @@
 
 namespace HBM\auth_server;
 
-require_once HBM_MAIN_UTIL_PATH . 'redis.php';
+// require_once HBM_MAIN_UTIL_PATH . 'redis.php';
 
 class HBM_SSO_User_Session
 {
@@ -23,7 +23,7 @@ class HBM_SSO_User_Session
                 'role' => 'guest'
             );
         } else {
-            $this->sso_user_session = \hbm_get_session($this->session_id);
+            $this->sso_user_session = \HBM\hbm_get_session($this->session_id);
         }
     }
 
@@ -42,7 +42,7 @@ class HBM_SSO_User_Session
             'role' => $role
         );
         $this->session_id =  $this->set_session_id();
-        \hbm_add_to_session($this->session_id, $this->sso_user_session);
+        \HBM\hbm_add_to_session($this->session_id, $this->sso_user_session);
     }
 
     public function set_sso_user($user)
@@ -50,7 +50,7 @@ class HBM_SSO_User_Session
         if (!$this->session_id) {
             $this->init(true, 'subscriber');
         }
-        $this->sso_user_session = \hbm_add_to_session($this->session_id, $user);
+        $this->sso_user_session = \HBM\hbm_add_to_session($this->session_id, $user);
     }
     public function get_sso_logout()
     {
@@ -62,7 +62,7 @@ class HBM_SSO_User_Session
         if (!$this->session_id) {
             $this->init(true, 'subscriber');
         }
-        $this->sso_user_session = \hbm_add_to_session($this->session_id, array('sso_logout' => $state));
+        $this->sso_user_session = \HBM\hbm_add_to_session($this->session_id, array('sso_logout' => $state));
     }
 
     public function logout_sso_user()
@@ -71,7 +71,7 @@ class HBM_SSO_User_Session
             'logged_in' => false,
             'role' => 'guest'
         );
-        \hbm_remove_session($this->session_id);
+        \HBM\hbm_remove_session($this->session_id);
         $this->remove_session_id();
     }
 

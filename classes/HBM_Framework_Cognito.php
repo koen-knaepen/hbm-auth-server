@@ -2,8 +2,8 @@
 
 namespace HBM\auth_server;
 
-require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
-require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
+// require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
+// require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
 
 class HBM_Framework_Cognito extends HBM_Auth_Framework
 {
@@ -50,7 +50,7 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
 
    public function exchange_code_for_tokens($code, $application)
    {
-      $settings = \hbm_fetch_pods_act('hbm-auth-server');
+      $settings = \HBM\hbm_fetch_pods_act('hbm-auth-server');
       if ($settings['test_server']) {
          $sso_server = $settings['test_domain'];
       } else {

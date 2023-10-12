@@ -5,7 +5,7 @@ namespace HBM\auth_server;
 use \HBM\HBM_Activate;
 
 // Include the necessary WordPress plugin functions
-require_once \HBM_MAIN_UTIL_PATH . 'classes/class-hbm-activate.php';
+// require_once \HBM_MAIN_UTIL_PATH . 'classes/class-hbm-activate.php';
 
 
 class HBM_Auth_Server_Activate extends HBM_Activate
