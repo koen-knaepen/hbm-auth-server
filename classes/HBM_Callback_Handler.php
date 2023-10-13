@@ -10,19 +10,8 @@ use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
 use function HBM\hbm_encode_transient_jwt;
 use function HBM\hbm_decode_transient_jwt;
-use function HBM\hbm_get_visit;
+use \HBM\HBM_SSO_User_Session;
 
-
-// // require_once HBM_MAIN_UTIL_PATH . 'encrypt.php';
-// // require_once HBM_MAIN_UTIL_PATH . 'helpers.php';
-// // require_once HBM_MAIN_UTIL_PATH . 'dev-tools.php';
-// // require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
-// // require_once HBM_MAIN_UTIL_PATH . 'plugin-utils.php';
-// // require_once HBM_MAIN_UTIL_PATH . 'gatekeeper.php';
-
-
-// // require_once HBM_PLUGIN_PATH . 'public/class-hbm-sso-user.php';
-// // require_once HBM_PLUGIN_PATH . 'api/class-abstract-framework.php';
 /**
  * Summary of class-hbm-callback-api
  * This class is responsible for the callback functionality of the User-PW authentication
@@ -262,7 +251,13 @@ class HBM_Callback_Handler
         $sso_user_received = hbm_extract_payload($sso_user_jwt);
         $sso_user = array_merge((array) $sso_user_received, (array) $state_payload);
         $user_session =  HBM_SSO_User_Session::get_instance($application['application_uid']);
-        $user_session->set_sso_user($sso_user);
+        $user_session_data = (array) $sso_user_received;
+        unset($user_session_data['identifier']);
+        $user_session->set_sso_user(
+            array(
+                'sso_user' =>     $user_session_data
+            )
+        );
         if ($state_payload->mode == 'test') {
 
             $message = "<h3>You are BACK on the SSO Server</h3>"
