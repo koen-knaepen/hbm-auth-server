@@ -13,8 +13,10 @@ use function HBM\hbm_check_tickets;
 class HBM_Auth_Server extends HBM_Root
 {
     private $admin;
-    private $api;
-    private $sso_user;
+    private $callback_handler;
+    private $callback_initiate;
+    private $callback_set_sso;
+    private $callback_logout;
 
     public function __construct()
     {
@@ -45,7 +47,10 @@ class HBM_Auth_Server extends HBM_Root
         );
         if ($ticket) {
             // require_once HBM_PLUGIN_PATH . 'api/class-hbm-callback-handler.php'; // API-related functionality
-            $this->api = new HBM_Callback_Handler();
+            $this->callback_handler = new HBM_Callback_Handler();
+            $this->callback_initiate = new HBM_Callback_Initiate();
+            $this->callback_set_sso = new HBM_Callback_Set_Sso();
+            $this->callback_logout = new HBM_Callback_Logout();
         }
     }
 
