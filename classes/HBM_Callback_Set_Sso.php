@@ -7,7 +7,7 @@ use function HBM\hbm_echo_modal;
 use function HBM\hbm_extract_domain;
 use function HBM\hbm_sub_namespace;
 use function HBM\hbm_decode_transient_jwt;
-use \HBM\HBM_SSO_User_Session;
+use \HBM\HBM_User_Session;
 
 /**
  * Summary of class-hbm-callback-api
@@ -46,8 +46,9 @@ class HBM_Callback_Set_Sso
         if (empty($sites)) {
             return false;
         }
-        $this->sso_user_session = HBM_SSO_User_Session::get_instance($sites[0]['application']);
-        return $sites[0]['application'];
+        $application = $sites[0]['application'];
+        $this->sso_user_session = HBM_User_Session::get_instance($application['application_uid']);
+        return $application;
     }
     public function enqueue_auth_script()
     {
