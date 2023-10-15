@@ -6,7 +6,7 @@ use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use function HBM\hbm_sub_namespace;
-use \HBM\HBM_SSO_User_Session;
+use \HBM\HBM_User_Session;
 use \HBM\HBM_Transient_Handler;
 
 /**
@@ -58,7 +58,7 @@ class HBM_Callback_Logout
         if (!isset($application)) {
             return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
         }
-        $sso_user_session = HBM_SSO_User_Session::get_instance($application);
+        $sso_user_session = HBM_User_Session::get_instance($application);
         $transient = HBM_Transient_Handler::get_instance();
         $state = $transient->get_transient('sso_logout');
         if (!isset($state)) {
