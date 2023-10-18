@@ -22,15 +22,17 @@ use \HBM\HBM_Transient_Handler;
 class HBM_Callback_Initiate
 {
 
-    /**
-     * Summary of _deprecated_constructor
-     * 1. Register the callback endpoint
-     */
+    use \HBM\Cookies_And_Sessions\HBM_session {
+        browser_transient as private;
+    }
 
     private $sso_user_session = null;
     private $transient = null;
+
     public function __construct()
     {
+        $this->transient = browser_transient();
+        $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -91,7 +93,7 @@ class HBM_Callback_Initiate
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
         if ($state_payload->action == 'logout') {
-            HBM_Transient_Handler::get_instance()->set_transient("sso_logout", $state_urlcoded, 5 * MINUTE_IN_SECONDS);
+            $this->transient->set("sso_logout", $state_urlcoded);
         }
         if ($state_payload->mode == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"

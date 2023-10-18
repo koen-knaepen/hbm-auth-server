@@ -20,6 +20,10 @@ use \HBM\HBM_User_Session;
 
 class HBM_Callback_Set_Sso
 {
+    use \HBM\Cookies_And_Sessions\HBM_session {
+        browser_transient as private;
+        user_session as private;
+    }
 
     /**
      * Summary of _deprecated_constructor
@@ -29,6 +33,7 @@ class HBM_Callback_Set_Sso
     private $sso_user_session = null;
     public function __construct()
     {
+        $this->sso_user_session = user_session();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -47,7 +52,7 @@ class HBM_Callback_Set_Sso
             return false;
         }
         $application = $sites[0]['application'];
-        $this->sso_user_session = HBM_User_Session::get_instance($application['application_uid']);
+        $this->sso_user_session->set_application($application['$application_uid']);
         return $application;
     }
     public function enqueue_auth_script()

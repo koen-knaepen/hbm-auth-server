@@ -2,6 +2,7 @@
 
 namespace HBM\auth_server;
 
+use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
@@ -22,6 +23,7 @@ use function HBM\hbm_encode_transient_jwt;
 class HBM_Callback_Handler
 {
 
+    private object $state_manager;
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -29,6 +31,7 @@ class HBM_Callback_Handler
 
     public function __construct()
     {
+        $this->state_manager = HBM_State_Manager::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -114,7 +117,7 @@ class HBM_Callback_Handler
             'action' => $state_payload->action,
             'mode' => $state_payload->mode,
         ) + (array) $framework_user;
-        $verify_token = json_decode(hbm_encode_transient_jwt($verify_payload, '', 'hbm-auth-access-'));
+        $verify_token = json_decode($this->state_manager->encode_transient_jwt($verify_payload,  'hbm-auth-access-'));
         $verify_token_urlcoded = urlencode($verify_token->jwt);
         $redirect_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
 

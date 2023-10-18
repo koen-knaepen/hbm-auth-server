@@ -21,6 +21,13 @@ use \HBM\HBM_Transient_Handler;
 class HBM_Callback_Logout
 {
 
+    use \HBM\Cookies_And_Sessions\HBM_Session {
+        browser_transient as private;
+        user_session as private;
+    }
+
+    private $transient;
+    private $sso_user_session;
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -28,6 +35,7 @@ class HBM_Callback_Logout
 
     public function __construct()
     {
+        $this->transient = browser_transient();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -58,17 +66,16 @@ class HBM_Callback_Logout
         if (!isset($application)) {
             return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
         }
-        $sso_user_session = HBM_User_Session::get_instance($application);
-        $transient = HBM_Transient_Handler::get_instance();
-        $state = $transient->get_transient('sso_logout');
+        $this->sso_user_session->set_application($application);
+        $state = $this->transient->get('sso_logout');
         if (!isset($state)) {
             return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
         $state_payload = hbm_extract_payload($state);
         $mode = $state_payload->mode;
         $logout_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/logout-client?state={$state}";
-        $sso_user_session->logout_sso_user();
-        $transient->delete_transient('sso_logout');
+        $this->sso_user_session->logout_sso_user();
+        $this->transient->delete('sso_logout');
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Logout request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
