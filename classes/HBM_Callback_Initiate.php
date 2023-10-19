@@ -8,7 +8,7 @@ use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
 use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
-use \HBM\HBM_Transient_Handler;
+use HBM\Cookies_And_Sessions\HBM_Session;
 
 /**
  * Summary of class-hbm-callback-api
@@ -22,7 +22,7 @@ use \HBM\HBM_Transient_Handler;
 class HBM_Callback_Initiate
 {
 
-    use \HBM\Cookies_And_Sessions\HBM_session {
+    use HBM_Session {
         browser_transient as private;
     }
 
@@ -31,7 +31,8 @@ class HBM_Callback_Initiate
 
     public function __construct()
     {
-        $this->transient = browser_transient();
+        $this->transient = $this->browser_transient();
+        error_log("HBM_Callback_Initiate: transient: " . get_class($this->transient));
         $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
