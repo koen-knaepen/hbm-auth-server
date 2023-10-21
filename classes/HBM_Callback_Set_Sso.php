@@ -33,7 +33,7 @@ class HBM_Callback_Set_Sso
     private $sso_user_session = null;
     public function __construct()
     {
-        $this->sso_user_session = user_session();
+        $this->sso_user_session = $this->user_session();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 

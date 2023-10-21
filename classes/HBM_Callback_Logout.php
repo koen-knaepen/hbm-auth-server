@@ -35,7 +35,7 @@ class HBM_Callback_Logout
 
     public function __construct()
     {
-        $this->transient = browser_transient();
+        $this->transient = $this->browser_transient();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
