@@ -6,8 +6,8 @@ use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_extract_domain;
 use function HBM\hbm_sub_namespace;
-use function HBM\hbm_decode_transient_jwt;
-use \HBM\HBM_User_Session;
+use \HBM\Cookies_And_Sessions\HBM_Session;
+use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 
 /**
  * Summary of class-hbm-callback-api
@@ -20,7 +20,7 @@ use \HBM\HBM_User_Session;
 
 class HBM_Callback_Set_Sso
 {
-    use \HBM\Cookies_And_Sessions\HBM_session {
+    use HBM_Session {
         browser_transient as private;
         user_session as private;
     }
@@ -31,9 +31,11 @@ class HBM_Callback_Set_Sso
      */
 
     private $sso_user_session = null;
+    private $state_manager = null;
     public function __construct()
     {
         $this->sso_user_session = $this->user_session();
+        $this->state_manager = HBM_State_Manager::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -52,7 +54,7 @@ class HBM_Callback_Set_Sso
             return false;
         }
         $application = $sites[0]['application'];
-        $this->sso_user_session->set_application($application['$application_uid']);
+        $this->sso_user_session->set_application($application['application_uid']);
         return $application;
     }
     public function enqueue_auth_script()
@@ -89,7 +91,7 @@ class HBM_Callback_Set_Sso
 
         $access_code_urlcoded = $request->get_param('access_code');
         $access_code = urldecode($access_code_urlcoded);
-        $framework_user = hbm_decode_transient_jwt($access_code);
+        $framework_user = $this->state_manager->decode_transient_jwt($access_code);
         $application = $this->get_application($state_payload->domain);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));

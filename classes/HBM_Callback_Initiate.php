@@ -32,7 +32,6 @@ class HBM_Callback_Initiate
     public function __construct()
     {
         $this->transient = $this->browser_transient();
-        error_log("HBM_Callback_Initiate: transient: " . get_class($this->transient));
         $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
