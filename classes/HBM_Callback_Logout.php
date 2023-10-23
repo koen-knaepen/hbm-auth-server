@@ -36,6 +36,7 @@ class HBM_Callback_Logout
     public function __construct()
     {
         $this->transient = $this->browser_transient();
+        $this->sso_user_session = $this->user_session();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -66,6 +67,7 @@ class HBM_Callback_Logout
         if (!isset($application)) {
             return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
         }
+        error_log("handle_framework_logout Application: " . $application);
         $this->sso_user_session->set_application($application);
         $state = $this->transient->get('sso_logout');
         if (!isset($state)) {
