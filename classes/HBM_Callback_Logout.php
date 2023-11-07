@@ -67,7 +67,6 @@ class HBM_Callback_Logout
         if (!isset($application)) {
             return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
         }
-        error_log("handle_framework_logout Application: " . $application);
         $this->sso_user_session->set_application($application);
         $state = $this->transient->get('sso_logout');
         if (!isset($state)) {
