@@ -31,7 +31,7 @@ class HBM_Callback_Handler
 
     public function __construct()
     {
-        $this->state_manager = HBM_State_Manager::options()::get_instance();
+        $this->state_manager = HBM_State_Manager::HBM()::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 

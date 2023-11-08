@@ -35,7 +35,7 @@ class HBM_Callback_Set_Sso
     public function __construct()
     {
         $this->sso_user_session = $this->user_session();
-        $this->state_manager = HBM_State_Manager::options()::get_instance();
+        $this->state_manager = HBM_State_Manager::HBM()::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
