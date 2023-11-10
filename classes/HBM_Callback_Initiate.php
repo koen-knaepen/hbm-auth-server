@@ -2,6 +2,7 @@
 
 namespace HBM\auth_server;
 
+use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
@@ -19,7 +20,7 @@ use HBM\Cookies_And_Sessions\HBM_Session;
  */
 
 
-class HBM_Callback_Initiate
+class HBM_Callback_Initiate extends HBM_Class_Handler
 {
 
     use HBM_Session {
@@ -36,6 +37,13 @@ class HBM_Callback_Initiate
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
+    protected static function set_pattern(): array
+    {
+        return [
+            'pattern' => 'singleton',
+            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'initiate']],
+        ];
+    }
 
     private function init_auth_framework($application)
     {

@@ -2,9 +2,9 @@
 
 namespace HBM\auth_server;
 
-// class-km2c-shortcodes.php
+use HBM\Instantiations\HBM_Class_Handler;
 
-class HBM_Server_Auth_Admin_Shortcodes
+class HBM_Server_Auth_Admin_Shortcodes extends HBM_Class_Handler
 {
 
     public function __construct()
@@ -12,6 +12,16 @@ class HBM_Server_Auth_Admin_Shortcodes
         // Register the shortcode when the class is instantiated.
         add_shortcode('hbm_callback_url', array($this, 'shortcode_callback'));
     }
+
+    protected static function set_pattern(): array
+    {
+        return [
+            'pattern' => 'singleton',
+            't_Entry' => ['is_admin'],
+        ];
+    }
+
+
 
     function shortcode_callback($attributes)
     {

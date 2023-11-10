@@ -2,12 +2,11 @@
 
 namespace HBM\auth_server;
 
+use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use function HBM\hbm_sub_namespace;
-use \HBM\HBM_User_Session;
-use \HBM\HBM_Transient_Handler;
 
 /**
  * Summary of class-hbm-callback-api
@@ -18,7 +17,7 @@ use \HBM\HBM_Transient_Handler;
  */
 
 
-class HBM_Callback_Logout
+class HBM_Callback_Logout extends HBM_Class_Handler
 {
 
     use \HBM\Cookies_And_Sessions\HBM_Session {
@@ -39,6 +38,15 @@ class HBM_Callback_Logout
         $this->sso_user_session = $this->user_session();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
+
+    protected static function set_pattern(): array
+    {
+        return [
+            'pattern' => 'singleton',
+            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'framework_logout']],
+        ];
+    }
+
 
     /**
      * Summary of hbm_register_callback_endpoint

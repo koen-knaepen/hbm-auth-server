@@ -2,6 +2,7 @@
 
 namespace HBM\auth_server;
 
+use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_create_uuid;
 
 // require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
@@ -16,7 +17,7 @@ use function HBM\hbm_create_uuid;
  * @subpackage admin
  */
 
-class HBM_Server_Auth_Admin
+class HBM_Server_Auth_Admin extends HBM_Class_Handler
 {
     private $admin_shortcodes;
 
@@ -28,16 +29,22 @@ class HBM_Server_Auth_Admin
      */
     public function __construct()
     {
-        if (is_admin()) {
-            $this->admin_shortcodes = new HBM_Server_Auth_Admin_Shortcodes();
-            add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
-            $this->on_save_settings_pods();
-        }
+        $this->admin_shortcodes = HBM_Server_Auth_Admin_Shortcodes::HBM()::get_instance();
+        add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
+        $this->on_save_settings_pods();
     }
+
+    protected static function set_pattern(): array
+    {
+        return [
+            'pattern' => 'singleton',
+            't_Entry' => ['is_admin', ['uri_params', ['page', ['pods-settings-hbm-auth-server']]]],
+        ];
+    }
+
 
     function hbm_modify_plugin_data($all_plugins)
     {
-        $original_plugin_path = HBM_PLUGIN_BASENAME;
         $is_active = is_plugin_active(HBM_PLUGIN_BASENAME);
         if ($is_active) {
             $all_plugins[HBM_PLUGIN_BASENAME]['Description'] = 'HBM Auth Server transforms your Wordpress Install into a Single Sign-On Server with the help of AWS Cognito or MS Entra.'

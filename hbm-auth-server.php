@@ -46,4 +46,4 @@ hbm_init_constants(__NAMESPACE__, __FILE__);
 
 
 // Initialize the main plugin class
-$hbm_server_plugin = new HBM_Auth_Server();
+$hbm_server_plugin = HBM_Auth_Server::HBM()::get_instance();

@@ -2,6 +2,7 @@
 
 namespace HBM\auth_server;
 
+use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_extract_domain;
@@ -18,7 +19,7 @@ use \HBM\Cookies_And_Sessions\HBM_State_Manager;
  */
 
 
-class HBM_Callback_Set_Sso
+class HBM_Callback_Set_Sso extends HBM_Class_Handler
 {
     use HBM_Session {
         browser_transient as private;
@@ -39,6 +40,13 @@ class HBM_Callback_Set_Sso
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
+    protected static function set_pattern(): array
+    {
+        return [
+            'pattern' => 'singleton',
+            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'sso_status']],
+        ];
+    }
 
     private function init_auth_framework($application)
     {
