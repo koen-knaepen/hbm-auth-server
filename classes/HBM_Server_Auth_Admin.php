@@ -38,7 +38,8 @@ class HBM_Server_Auth_Admin extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            't_Entry' => ['is_admin', ['uri_params', ['page', ['pods-settings-hbm-auth-server']]]],
+            '__ticket' =>
+            ['Entry' => ['is_admin', ['uri_params', ['page', ['pods-settings-hbm-auth-server']]]]],
         ];
     }
 

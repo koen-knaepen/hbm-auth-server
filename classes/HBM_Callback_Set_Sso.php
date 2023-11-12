@@ -44,7 +44,8 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'sso_status']],
+            '__ticket' =>
+            ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'sso_status']]],
         ];
     }
 

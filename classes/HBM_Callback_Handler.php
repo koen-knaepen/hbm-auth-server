@@ -39,7 +39,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'callback']],
+            '__ticket' => ['Entry' => ['is_api',  ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'callback']]],
         ];
     }
 

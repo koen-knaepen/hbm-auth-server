@@ -41,7 +41,8 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'initiate']],
+            '__ticket' =>
+            ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'initiate']]],
         ];
     }
 

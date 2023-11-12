@@ -43,7 +43,8 @@ class HBM_Callback_Logout extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            't_Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'framework_logout']],
+            '__ticket' =>
+            ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'framework_logout']]],
         ];
     }
 
