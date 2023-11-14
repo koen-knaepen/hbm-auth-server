@@ -24,19 +24,25 @@ class HBM_Auth_Server extends HBM_Root
     protected static function set_pattern(): array
     {
         $pattern = parent::set_pattern();
-        return array_merge(
+        return array_merge_recursive(
             $pattern,
             [
                 '__ticket' =>
                 ['Entry' => [
-                    'is_admin',
+                    '_OR_' =>
                     [
-                        'uri_params',
-                        ['page', [
-                            'pods-settings-hbm-auth-server',
-                            'pods-manage-hbm-auth-server-application',
-                            'pods-manage-hbm-auth-server-site'
-                        ]]
+                        ['check_api_namespace', 'hbm-auth-server'],
+                        '_AND_' => [
+                            'is_admin',
+                            [
+                                'uri_params',
+                                ['page', [
+                                    'pods-settings-hbm-auth-server',
+                                    'pods-manage-hbm-auth-server-application',
+                                    'pods-manage-hbm-auth-server-site'
+                                ]]
+                            ]
+                        ],
                     ]
                 ]],
             ]
