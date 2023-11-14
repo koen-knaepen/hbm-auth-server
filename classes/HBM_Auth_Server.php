@@ -21,6 +21,27 @@ class HBM_Auth_Server extends HBM_Root
         parent::__construct(__NAMESPACE__);
     }
 
+    protected static function set_pattern(): array
+    {
+        $pattern = parent::set_pattern();
+        return array_merge(
+            $pattern,
+            [
+                '__ticket' =>
+                ['Entry' => [
+                    'is_admin',
+                    [
+                        'uri_params',
+                        ['page', [
+                            'pods-settings-hbm-auth-server',
+                            'pods-manage-hbm-auth-server-application',
+                            'pods-manage-hbm-auth-server-site'
+                        ]]
+                    ]
+                ]],
+            ]
+        );
+    }
     function init_plugin()
     {
 
