@@ -3,10 +3,11 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
+use HBM\Data_Handlers\HBM_Data_Helpers;
+
 
 /**
  * Summary of class-hbm-callback-api
@@ -26,6 +27,9 @@ class HBM_Callback_Logout extends HBM_Class_Handler
     }
 
     use HBM_Plugin_Utils;
+    use HBM_Data_Helpers {
+        hbm_extract_payload as private;
+    }
 
     private $transient;
     private $sso_user_session;
@@ -83,9 +87,9 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         if (!isset($state)) {
             return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
-        $state_payload = hbm_extract_payload($state);
-        $mode = $state_payload->mode;
-        $logout_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/logout-client?state={$state}";
+        $state_payload = $this->hbm_extract_payload($state);
+        $mode = $state_payload['mode'];
+        $logout_url = "{$state_payload['domain']}/wp-json/hbm-auth-client/v1/logout-client?state={$state}";
         $this->sso_user_session->logout_sso_user();
         $this->transient->delete('sso_logout');
         if ($mode == 'test') {

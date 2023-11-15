@@ -3,12 +3,13 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_extract_domain;
 use \HBM\Cookies_And_Sessions\HBM_Session;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
+use HBM\Data_Handlers\HBM_Data_Helpers;
+
 
 /**
  * Summary of class-hbm-callback-api
@@ -27,6 +28,10 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     }
 
     use HBM_Plugin_Utils;
+    use HBM_Data_Helpers {
+        hbm_extract_payload as private;
+    }
+
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -97,12 +102,12 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     {
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
-        $state_payload = hbm_extract_payload($state);
+        $state_payload = $this->hbm_extract_payload($state);
 
         $access_code_urlcoded = $request->get_param('access_code');
         $access_code = urldecode($access_code_urlcoded);
         $framework_user = $this->state_manager->decode_transient_jwt($access_code);
-        $application = $this->get_application($state_payload->domain);
+        $application = $this->get_application($state_payload['domain']);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
@@ -111,12 +116,12 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
         $framework_context = $framework_api->get_framework_context();
         $sso_user_urlcoded = $request->get_param('sso_user');
         $sso_user_jwt = urldecode($sso_user_urlcoded);
-        $sso_user_received = hbm_extract_payload($sso_user_jwt);
-        $sso_user = array_merge((array) $sso_user_received, (array) $state_payload);
+        $sso_user_received = $this->hbm_extract_payload($sso_user_jwt);
+        $sso_user = array_merge($sso_user_received, $state_payload);
         $user_session_data = (array) $sso_user_received;
         unset($user_session_data['identifier']);
         $this->sso_user_session->set_sso_user($user_session_data);
-        if ($state_payload->mode == 'test') {
+        if ($state_payload['mode'] == 'test') {
 
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Access Code is decoded and valid: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"

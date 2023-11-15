@@ -3,13 +3,14 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
 use function HBM\hbm_get_current_domain;
 use HBM\Cookies_And_Sessions\HBM_Session;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
+use HBM\Data_Handlers\HBM_Data_Helpers;
+
 
 /**
  * Summary of class-hbm-callback-api
@@ -27,6 +28,10 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         browser_transient as private;
     }
     use HBM_Plugin_Utils;
+    use HBM_Data_Helpers {
+        hbm_extract_payload as private;
+    }
+
 
     private $sso_user_session = null;
     private $transient = null;
@@ -93,19 +98,19 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     {
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
-        $state_payload = hbm_extract_payload($state);
-        $application = $this->get_application($state_payload->domain);
+        $state_payload = $this->hbm_extract_payload($state);
+        $application = $this->get_application($state_payload['domain']);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
         $framework_api = $this->init_auth_framework($application);
-        $redirect_url = $this->get_redirect_url($state_payload->action, $application);
+        $redirect_url = $this->get_redirect_url($state_payload['action'], $application);
 
-        $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload->action, $redirect_url, $state_urlcoded, $application);
-        if ($state_payload->action == 'logout') {
+        $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload['action'], $redirect_url, $state_urlcoded, $application);
+        if ($state_payload['action'] == 'logout') {
             $this->transient->set("sso_logout", $state_urlcoded);
         }
-        if ($state_payload->mode == 'test') {
+        if ($state_payload['mode'] == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"
                 . "<p>Initatiate request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
             hbm_echo_modal($initiate_endpoint, $message);

@@ -4,13 +4,12 @@ namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
-use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
-use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
+use HBM\Data_Handlers\HBM_Data_Helpers;
 
 /**
  * Summary of class-hbm-callback-api
@@ -25,6 +24,10 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 {
 
     use HBM_Plugin_Utils;
+    use HBM_Data_Helpers {
+        hbm_extract_payload as private;
+    }
+
     private object $state_manager;
     /**
      * Summary of _deprecated_constructor
@@ -94,13 +97,13 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         // $this->log_request($request);
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
-        $state_payload = hbm_extract_payload($state);
+        $state_payload = $this->hbm_extract_payload($state);
         $code = $request->get_param('code');
 
         if (empty($code)) {
             return new \WP_Error('no_code', 'No code received', array('status' => 400));
         }
-        $application = $this->get_application($state_payload->domain);
+        $application = $this->get_application($state_payload['domain']);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
@@ -114,7 +117,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         }
 
         $id_token = $tokens['id_token'];
-        $verified_user = hbm_extract_payload($id_token);
+        $verified_user = $this->hbm_extract_payload($id_token);
         $framework_user = $framework_api->transform_to_wp_user($verified_user, $state_payload);
         //create a JWT token that can be verified on return
         $site_domain = hbm_get_current_domain();
@@ -122,15 +125,15 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             'role' => 'subscriber',
             'time' => time(),
             'auth_domain' => $site_domain,
-            'origin_domain' => $state_payload->domain,
-            'action' => $state_payload->action,
-            'mode' => $state_payload->mode,
+            'origin_domain' => $state_payload['domain'],
+            'action' => $state_payload['action'],
+            'mode' => $state_payload['mode'],
         ) + (array) $framework_user;
         $verify_token = json_decode($this->state_manager->encode_transient_jwt($verify_payload,  'hbm-auth-access-'));
         $verify_token_urlcoded = urlencode($verify_token->jwt);
-        $redirect_url = "{$state_payload->domain}/wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
+        $redirect_url = "{$state_payload['domain']}/wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
 
-        if ($state_payload->mode == 'test') {
+        if ($state_payload['mode'] == 'test') {
 
             $message = "<h3>You are on the SSO Server</h3>"
                 . "<p>Authentication from {$framework_context->label} received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"
