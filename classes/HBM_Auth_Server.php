@@ -2,7 +2,7 @@
 
 namespace HBM\auth_server;
 
-use \HBM\HBM_Root;
+use \HBM\Plugin_Management\HBM_Root;
 
 // Include the necessary HBM and other files
 // require_once HBM_MAIN_UTIL_PATH . 'classes/class-hbm-root.php'; // Root class template

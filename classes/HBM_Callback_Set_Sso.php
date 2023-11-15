@@ -6,9 +6,9 @@ use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_extract_domain;
-use function HBM\hbm_sub_namespace;
 use \HBM\Cookies_And_Sessions\HBM_Session;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
+use \HBM\Plugin_Management\HBM_Plugin_Utils;
 
 /**
  * Summary of class-hbm-callback-api
@@ -26,6 +26,7 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
         user_session as private;
     }
 
+    use HBM_Plugin_Utils;
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -81,7 +82,7 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     public function hbm_register_endpoint()
     {
         register_rest_route(
-            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/sso_status',
             array(
                 'methods' => 'GET',

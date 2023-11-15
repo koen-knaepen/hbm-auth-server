@@ -7,9 +7,9 @@ use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
-use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
 use HBM\Cookies_And_Sessions\HBM_Session;
+use HBM\Plugin_Management\HBM_Plugin_Utils;
 
 /**
  * Summary of class-hbm-callback-api
@@ -26,6 +26,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     use HBM_Session {
         browser_transient as private;
     }
+    use HBM_Plugin_Utils;
 
     private $sso_user_session = null;
     private $transient = null;
@@ -76,7 +77,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     public function hbm_register_endpoint()
     {
         register_rest_route(
-            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/initiate',
             array(
                 'methods' => 'GET',

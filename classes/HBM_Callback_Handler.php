@@ -10,6 +10,7 @@ use function HBM\hbm_set_headers;
 use function HBM\hbm_extract_domain;
 use function HBM\hbm_sub_namespace;
 use function HBM\hbm_get_current_domain;
+use \HBM\Plugin_Management\HBM_Plugin_Utils;
 
 /**
  * Summary of class-hbm-callback-api
@@ -23,6 +24,7 @@ use function HBM\hbm_get_current_domain;
 class HBM_Callback_Handler extends HBM_Class_Handler
 {
 
+    use HBM_Plugin_Utils;
     private object $state_manager;
     /**
      * Summary of _deprecated_constructor
@@ -69,7 +71,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     public function hbm_register_endpoint()
     {
         register_rest_route(
-            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/callback',
             array(
                 'methods' => 'GET',

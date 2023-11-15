@@ -6,7 +6,7 @@ use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_extract_payload;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
-use function HBM\hbm_sub_namespace;
+use HBM\Plugin_Management\HBM_Plugin_Utils;
 
 /**
  * Summary of class-hbm-callback-api
@@ -24,6 +24,8 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         browser_transient as private;
         user_session as private;
     }
+
+    use HBM_Plugin_Utils;
 
     private $transient;
     private $sso_user_session;
@@ -60,7 +62,7 @@ class HBM_Callback_Logout extends HBM_Class_Handler
     {
 
         register_rest_route(
-            "hbm-" . hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/framework_logout',
             array(
                 'methods' => 'GET',

@@ -2,7 +2,7 @@
 
 namespace HBM\auth_server;
 
-use \HBM\HBM_Activate;
+use \HBM\Plugin_management\HBM_Activate;
 
 // Include the necessary WordPress plugin functions
 // require_once \HBM_MAIN_UTIL_PATH . 'classes/class-hbm-activate.php';
