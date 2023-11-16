@@ -17,9 +17,6 @@
 
 namespace HBM\auth_server;
 
-use function \HBM\hbm_init_constants;
-
-
 // If this file is called directly, abort.
 if (!defined('ABSPATH')) {
     die("You are not supposed to be here");
@@ -28,22 +25,6 @@ if (!defined('ABSPATH')) {
 // start with enabling autoloading
 require_once \WP_PLUGIN_DIR . '/hbm-main/vendor/autoload.php';
 
-// HBM_MAIN_UTIL_PATH is a global constant defined to get access to the main utilities.
-if (!defined('HBM_MAIN_UTIL_PATH')) define('HBM_MAIN_UTIL_PATH', \WP_PLUGIN_DIR . '/hbm-main/main-utility/');
-
-// CREATE THE HBM CONSTANTS 
-// The hbm-constants.php file is located in the main-utility folder.    
-// It contains the hbm_define_constants() function that defines the constants for the plugin paths.
-// HBM_PLUGIN_PATH, HBM_PLUGIN_URL
-// HBM_PLUGIN_FILE, HBM_PLUGIN_BASENAME
-// HBM_PLUGIN_NAME, HBM_PLUGIN_VERSION
-// require_once \HBM_MAIN_UTIL_PATH .  'main-utils.php'; // Constants class
-
-hbm_init_constants(__NAMESPACE__, __FILE__);
-
-// Include necessary files
-// require_once HBM_PLUGIN_PATH . 'includes/class-hbm-auth-server.php'; // Main plugin class
-
 
 // Initialize the main plugin class
-$hbm_server_plugin = HBM_Auth_Server::HBM()::get_instance();
+$hbm_server_plugin = HBM_Auth_Server::HBM()::get_instance(__FILE__);

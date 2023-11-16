@@ -16,9 +16,9 @@ class HBM_Auth_Server extends HBM_Root
     private $callback_set_sso;
     private $callback_logout;
 
-    public function __construct()
+    public function __construct($file)
     {
-        parent::__construct(__NAMESPACE__);
+        parent::__construct(__NAMESPACE__, $file);
     }
 
     protected static function set_pattern(): array
