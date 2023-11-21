@@ -19,6 +19,11 @@ class HBM_Auth_Server extends HBM_Root
     public function __construct($file)
     {
         parent::__construct(__NAMESPACE__, $file);
+        $this->admin = HBM_Server_Auth_Admin::HBM()::get_instance();
+        $this->callback_handler = HBM_Callback_Handler::HBM()::get_instance();
+        $this->callback_initiate = HBM_Callback_Initiate::HBM()::get_instance();
+        $this->callback_set_sso = HBM_Callback_Set_Sso::HBM()::get_instance();
+        $this->callback_logout = HBM_Callback_Logout::HBM()::get_instance();
     }
 
     protected static function set_pattern(): array
@@ -47,20 +52,5 @@ class HBM_Auth_Server extends HBM_Root
                 ]],
             ]
         );
-    }
-    function init_plugin()
-    {
-
-        // require_once HBM_PLUGIN_PATH . 'admin/class-hbm-auth-admin.php'; // Admin-related functionality
-        $this->admin = HBM_Server_Auth_Admin::HBM()::get_instance();
-
-        $this->callback_handler = HBM_Callback_Handler::HBM()::get_instance();
-        $this->callback_initiate = HBM_Callback_Initiate::HBM()::get_instance();
-        $this->callback_set_sso = HBM_Callback_Set_Sso::HBM()::get_instance();
-        $this->callback_logout = HBM_Callback_Logout::HBM()::get_instance();
-    }
-
-    function fastlane()
-    {
     }
 }

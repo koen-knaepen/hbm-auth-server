@@ -9,6 +9,7 @@ use \HBM\Cookies_And_Sessions\HBM_Session;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\Database_Sessions\Pods_Session_Factory;
 
 
 /**
@@ -39,10 +40,12 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
 
     private $sso_user_session = null;
     private $state_manager = null;
+    private object $pods_session;
     public function __construct()
     {
         $this->sso_user_session = $this->user_session();
         $this->state_manager = HBM_State_Manager::HBM()::get_instance();
+        $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -64,11 +67,11 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     private function get_application($input_domain)
     {
         $domain = hbm_extract_domain($input_domain);
-        $sites = \HBM\hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
-        if (empty($sites)) {
-            return false;
+        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
+        if (!$application) {
+            throw new \Exception("No application found for domain {$domain}, please see the administrator");
         }
-        $application = $sites[0]['application'];
+
         $this->sso_user_session->set_application($application['application_uid']);
         return $application;
     }

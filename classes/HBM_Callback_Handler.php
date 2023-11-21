@@ -10,6 +10,7 @@ use function HBM\hbm_extract_domain;
 use function HBM\hbm_get_current_domain;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\Database_Sessions\Pods_Session_Factory;
 
 /**
  * Summary of class-hbm-callback-api
@@ -29,6 +30,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     }
 
     private object $state_manager;
+    private object $pods_session;
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -37,6 +39,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     public function __construct()
     {
         $this->state_manager = HBM_State_Manager::HBM()::get_instance();
+        $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -57,11 +60,12 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     private function get_application($input_domain)
     {
         $domain = hbm_extract_domain($input_domain);
-        $sites = \HBM\hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
-        if (empty($sites)) {
-            return false;
+        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
+        if ($application) {
+            return $application;
+        } else {
+            throw new \Exception("No application found for domain {$domain}, please see the administrator");
         }
-        return $sites[0]['application'];
     }
 
     /**

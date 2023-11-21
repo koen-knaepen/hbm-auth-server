@@ -10,6 +10,7 @@ use function HBM\hbm_get_current_domain;
 use HBM\Cookies_And_Sessions\HBM_Session;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\Database_Sessions\Pods_Session_Factory;
 
 
 /**
@@ -35,11 +36,13 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private $sso_user_session = null;
     private $transient = null;
+    private object $pods_session;
 
     public function __construct()
     {
         $this->transient = $this->browser_transient();
         $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
+        $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -61,11 +64,12 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     private function get_application($input_domain)
     {
         $domain = hbm_extract_domain($input_domain);
-        $sites = \HBM\hbm_fetch_pods_act('hbm-auth-server-site', array('name' => $domain));
-        if (empty($sites)) {
-            return false;
+        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
+        if ($application) {
+            return $application;
+        } else {
+            throw new \Exception("No application found for domain {$domain}, please see the administrator");
         }
-        return $sites[0]['application'];
     }
     public function enqueue_auth_script()
     {
@@ -123,9 +127,9 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_redirect_url($action, $application)
     {
-        $settings = \HBM\hbm_fetch_pods_act('hbm-auth-server');
-        if ($settings['test_server']) {
-            $sso_server = $settings['test_domain'];
+        $test_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_server')->get_raw_data();
+        if ($test_server) {
+            $sso_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_domain')->get_raw_data();
         } else {
             $sso_server = hbm_get_current_domain() . '/';
         }
