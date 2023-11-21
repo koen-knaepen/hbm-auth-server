@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // start with enabling autoloading
-require_once \WP_PLUGIN_DIR . '/hbm-main/vendor/autoload.php';
+// require_once \WP_PLUGIN_DIR . '/hbm-main/vendor/autoload.php';
 
 
 // Initialize the main plugin class
