@@ -22,5 +22,8 @@ if (!defined('ABSPATH')) {
     die("You are not supposed to be here");
 }
 
+// start with enabling autoloading
+require_once \WP_PLUGIN_DIR . '/hbm-main/vendor/autoload.php';
+
 // Initialize the main plugin class
 $hbm_server_plugin = HBM_Auth_Server::HBM()::get_instance(__FILE__);
