@@ -15,9 +15,17 @@ class HBM_Auth_Server_Activate extends HBM_Activate
         parent::__construct(__NAMESPACE__);
     }
 
-    protected function extend_params()
+    protected function extend_params(): array
     {
-        $this->pods_params['settings'] = 'hbm-auth-server';
-        $this->pods_params['file_pattern'] = 'hbm-auth-server-pods-package';
+        return [
+            'settings' => 'hbm-auth-server',
+            'file_pattern' => 'hbm-auth-server-pods-package',
+            'pods_settings_on_activate' => [
+                'menu_location' => 'top',
+            ],
+            'pods_settings_on_deactivate' => [
+                'menu_location' => 'submenu',
+            ],
+        ];
     }
 }
