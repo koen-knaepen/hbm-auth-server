@@ -19,7 +19,7 @@ class HBM_Auth_Server_Activate extends HBM_Activate
     {
         return [
             'settings' => 'hbm-auth-server',
-            'file_pattern' => 'hbm-auth-server-pods-package',
+            'file_pattern' => 'hbm-auth-server-pods-package-',
             'pods_settings_on_activate' => [
                 'menu_location' => 'top',
             ],
