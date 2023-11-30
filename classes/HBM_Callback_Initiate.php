@@ -63,12 +63,14 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_application($input_domain)
     {
-        $domain = hbm_extract_domain($input_domain);
-        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
+        error_log("input_domain: " . $input_domain);
+        // $domain = hbm_extract_domain($input_domain);
+        // error_log("domain: " . $domain);
+        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $input_domain])->get_raw_data();
         if ($application) {
             return $application;
         } else {
-            throw new \Exception("No application found for domain {$domain}, please see the administrator");
+            throw new \Exception("No application found for domain {$input_domain}, please see the administrator");
         }
     }
     public function enqueue_auth_script()

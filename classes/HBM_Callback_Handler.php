@@ -59,7 +59,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     private function get_application($input_domain)
     {
-        $domain = hbm_extract_domain($input_domain);
+        $domain = $input_domain;
         $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
         if ($application) {
             return $application;
