@@ -66,13 +66,13 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
 
     private function get_application($input_domain)
     {
-        $domain = hbm_extract_domain($input_domain);
+        $domain = $input_domain;
         $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
         if (!$application) {
             throw new \Exception("No application found for domain {$domain}, please see the administrator");
         }
 
-        $this->sso_user_session->set_application($application['application_uid']);
+        $this->sso_user_session->set_application($application['id']);
         return $application;
     }
     public function enqueue_auth_script()

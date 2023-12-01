@@ -17,7 +17,6 @@ class HBM_Server_Auth_Admin_Shortcodes extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            '__log' => ['name'],
             '__ticket' =>
             ['Entry' => ['is_admin']],
         ];
@@ -25,9 +24,9 @@ class HBM_Server_Auth_Admin_Shortcodes extends HBM_Class_Handler
 
     function shortcode_callback($attributes)
     {
-        $specific_domain = pods('hbm-auth-server')->field('hbm_auth_server_test_server');
+        $specific_domain = pods('hbm-auth-server')->field('test_server');
         if ($specific_domain) {
-            $domain = pods('hbm-auth-server')->field('hbm_auth_server_test_domain');
+            $domain = pods('hbm-auth-server')->field('test_domain');
         } else {
             $domain = get_site_url() . '/';
         }

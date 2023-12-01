@@ -63,9 +63,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_application($input_domain)
     {
-        error_log("input_domain: " . $input_domain);
-        // $domain = hbm_extract_domain($input_domain);
-        // error_log("domain: " . $domain);
         $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $input_domain])->get_raw_data();
         if ($application) {
             return $application;
@@ -136,7 +133,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
             $sso_server = hbm_get_current_domain() . '/';
         }
         if ($action == 'logout') {
-            $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/framework_logout?app=' . $application['application_uid']; // Construct the logout URL based on the sso server's domain
+            $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/framework_logout?app=' . $application['id']; // Construct the logout URL based on the sso server's domain
         } else {
             $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/callback'; // Construct the redirect URL based on the sso server's domain
         }

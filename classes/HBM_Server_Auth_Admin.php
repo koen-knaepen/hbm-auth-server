@@ -3,19 +3,8 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
+use HBM\Loader\Alien_Hooks;
 use function HBM\hbm_create_uuid;
-
-// require_once HBM_PLUGIN_PATH . 'admin/class-hbm-admin-shortcodes.php'; // Admin-related functionality
-// require_once HBM_MAIN_UTIL_PATH . 'helpers.php'; // Helper functions
-// // require_once HBM_MAIN_UTIL_PATH . 'pods-act.php';
-
-
-/**
- * Class HBM_Auth_Admin
- * This class is responsible for the admin panel functionality
- * @package HBM_Entra_Auth
- * @subpackage admin
- */
 
 class HBM_Server_Auth_Admin extends HBM_Class_Handler
 {
@@ -29,6 +18,7 @@ class HBM_Server_Auth_Admin extends HBM_Class_Handler
      */
     public function __construct()
     {
+        // Alien_Hooks::HBM()::get_instance()->register_proxy(HBM_MAIN_PROXIES . 'Pods_Proxy.php', 'Pods');
         $this->admin_shortcodes = HBM_Server_Auth_Admin_Shortcodes::HBM()::get_instance();
         add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
         $this->on_save_settings_pods();
@@ -57,16 +47,12 @@ class HBM_Server_Auth_Admin extends HBM_Class_Handler
     function on_save_settings_pods()
     {
         // Insert here all the actions that need to be done when the settings are saved
-        add_action('pods_api_post_save_pod_item_hbm-auth-server-application', array($this, 'hbm_on_save_an_application'), 10, 3);
+        error_log("on_save_settings_pods is activated");
+        add_action('pods_api_pre_save_pod_item_hbm-auth-server-application', array($this, 'hbm_on_save_an_application'), 10, 3);
     }
 
     function hbm_on_save_an_application($pieces, $is_new_item, $id)
     {
-        if ($is_new_item) {
-            $uuid = hbm_create_uuid();
-            \hbm_change_pods_item_field('hbm-auth-server-application', $id, array(
-                'application_uid' => $uuid
-            ));
-        }
+        error_log("hbm_on_save_an_application is activated :new item? " . print_r($is_new_item, true) . " id " . print_r($id, true));
     }
 }
