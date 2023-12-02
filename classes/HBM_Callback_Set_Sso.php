@@ -4,7 +4,6 @@ namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
 use function HBM\hbm_echo_modal;
-use function HBM\hbm_extract_domain;
 use \HBM\Cookies_And_Sessions\HBM_Session;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
@@ -28,7 +27,6 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
         user_session as private;
     }
 
-    use HBM_Plugin_Utils;
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
     }
@@ -37,12 +35,13 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
      */
-
+    private $plugin_utils;
     private $sso_user_session = null;
     private $state_manager = null;
     private object $pods_session;
     public function __construct()
     {
+        $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->sso_user_session = $this->user_session();
         $this->state_manager = HBM_State_Manager::HBM()::get_instance();
         $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
@@ -90,7 +89,7 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     public function hbm_register_endpoint()
     {
         register_rest_route(
-            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->plugin_utils->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/sso_status',
             array(
                 'methods' => 'GET',

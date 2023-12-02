@@ -26,11 +26,11 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         user_session as private;
     }
 
-    use HBM_Plugin_Utils;
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
     }
 
+    private $plugin_utils;
     private $transient;
     private $sso_user_session;
     /**
@@ -40,6 +40,7 @@ class HBM_Callback_Logout extends HBM_Class_Handler
 
     public function __construct()
     {
+        $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->transient = $this->browser_transient();
         $this->sso_user_session = $this->user_session();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
@@ -66,7 +67,7 @@ class HBM_Callback_Logout extends HBM_Class_Handler
     {
 
         register_rest_route(
-            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->plugin_utils->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/framework_logout',
             array(
                 'methods' => 'GET',

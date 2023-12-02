@@ -24,11 +24,10 @@ use HBM\Database_Sessions\Pods_Session_Factory;
 class HBM_Callback_Handler extends HBM_Class_Handler
 {
 
-    use HBM_Plugin_Utils;
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
     }
-
+    private $plugin_utils;
     private object $state_manager;
     private object $pods_session;
     /**
@@ -38,6 +37,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     public function __construct()
     {
+        $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->state_manager = HBM_State_Manager::HBM()::get_instance();
         $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
@@ -78,7 +78,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     public function hbm_register_endpoint()
     {
         register_rest_route(
-            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->plugin_utils->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/callback',
             array(
                 'methods' => 'GET',
@@ -98,7 +98,6 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     public function handle_callback(\WP_REST_Request $request)
     {
         // Get the authorization code from Framework
-        // $this->log_request($request);
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
         $state_payload = $this->hbm_extract_payload($state);

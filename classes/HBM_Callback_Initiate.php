@@ -28,18 +28,18 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     use HBM_Session {
         browser_transient as private;
     }
-    use HBM_Plugin_Utils;
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
     }
 
-
+    private $plugin_utils;
     private $sso_user_session = null;
     private $transient = null;
     private object $pods_session;
 
     public function __construct()
     {
+        $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->transient = $this->browser_transient();
         $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
         $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
@@ -85,7 +85,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     public function hbm_register_endpoint()
     {
         register_rest_route(
-            "hbm-" . $this->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
+            "hbm-" . $this->plugin_utils->hbm_sub_namespace(__NAMESPACE__, true) . '/v1',
             '/initiate',
             array(
                 'methods' => 'GET',
