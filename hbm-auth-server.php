@@ -26,4 +26,5 @@ if (!defined('ABSPATH')) {
 require_once \WP_PLUGIN_DIR . '/hbm-main/vendor/autoload.php';
 
 // Initialize the main plugin class
-$hbm_server_plugin = HBM_Auth_Server::HBM()::get_instance(__FILE__);
+HBM_Auth_Server::init_plugin(__NAMESPACE__, __FILE__);
+HBM_Auth_Server::HBM()::get_instance();

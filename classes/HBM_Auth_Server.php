@@ -11,12 +11,6 @@ use HBM\Pods_Helpers\Watch_Pod;
 
 class HBM_Auth_Server extends HBM_Root
 {
-
-    public function __construct($file)
-    {
-        parent::__construct(__NAMESPACE__, $file);
-    }
-
     protected static function set_pattern(): array
     {
         HBM_Server_Auth_Admin::HBM()::get_instance();
@@ -24,6 +18,6 @@ class HBM_Auth_Server extends HBM_Root
         HBM_Callback_Initiate::HBM()::get_instance();
         HBM_Callback_Set_Sso::HBM()::get_instance();
         HBM_Callback_Logout::HBM()::get_instance();
-        return parent::set_pattern();
+        return array_merge(parent::set_pattern(), []);
     }
 }
