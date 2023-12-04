@@ -53,6 +53,7 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
+            // '__log' => ['name'],
             '__ticket' =>
             ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'sso_status']]],
         ];
@@ -130,9 +131,10 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
                 . "<p>{$framework_context->label} user: </p><pre>" . json_encode($framework_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>'
                 . "<p>SSO user: </p><pre>" . json_encode($sso_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
             hbm_echo_modal(null, $message);
-        } else {
-            hbm_set_headers();
-            echo "<script type='text/javascript'>    window.close();</script>";
         }
+        // else {
+        //     hbm_set_headers();
+        //     echo "<script type='text/javascript'>    window.close();</script>";
+        // }
     }
 }

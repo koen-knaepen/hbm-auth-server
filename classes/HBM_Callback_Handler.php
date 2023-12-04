@@ -6,11 +6,11 @@ use HBM\Instantiations\HBM_Class_Handler;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use function HBM\hbm_echo_modal;
 use function HBM\hbm_set_headers;
-use function HBM\hbm_extract_domain;
 use function HBM\hbm_get_current_domain;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
+use \HBM\Cookies_And_Sessions\HBM_Session;
 
 /**
  * Summary of class-hbm-callback-api
@@ -23,10 +23,14 @@ use HBM\Database_Sessions\Pods_Session_Factory;
 
 class HBM_Callback_Handler extends HBM_Class_Handler
 {
+    use HBM_Session {
+        user_session as private;
+    }
 
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
     }
+    private $sso_user_session = null;
     private $plugin_utils;
     private object $state_manager;
     private object $pods_session;
@@ -37,6 +41,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     public function __construct()
     {
+        $this->sso_user_session = $this->user_session();
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->state_manager = HBM_State_Manager::HBM()::get_instance();
         $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
@@ -62,6 +67,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         $domain = $input_domain;
         $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
         if ($application) {
+            $this->sso_user_session->set_application($application['id']);
             return $application;
         } else {
             throw new \Exception("No application found for domain {$domain}, please see the administrator");
