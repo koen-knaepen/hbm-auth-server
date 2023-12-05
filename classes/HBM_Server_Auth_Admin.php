@@ -3,10 +3,10 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
+use HBM\Plugin_Management\HBM_Admin_Shortcodes;
 
 class HBM_Server_Auth_Admin extends HBM_Class_Handler
 {
-    private $admin_shortcodes;
 
     /**
      * Summary of __construct
@@ -16,7 +16,8 @@ class HBM_Server_Auth_Admin extends HBM_Class_Handler
      */
     public function __construct()
     {
-        $this->admin_shortcodes = HBM_Server_Auth_Admin_Shortcodes::HBM()::get_instance();
+        HBM_Admin_Shortcodes::HBM()::get_instance();
+        HBM_Server_Auth_Admin_Shortcodes::HBM()::get_instance();
         add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
     }
 
