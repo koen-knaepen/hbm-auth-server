@@ -138,7 +138,9 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             'action' => $state_payload['action'],
             'mode' => $state_payload['mode'],
         ) + (array) $framework_user;
-        $verify_token = json_decode($this->state_manager->encode_transient_jwt($verify_payload,  'hbm-auth-access-'));
+        $this->sso_user_session->set_sso_user($verify_payload);
+
+        $verify_token = json_decode($this->state_manager->encode_transient_jwt($verify_payload,  'hbm-auth-access-', false));
         $verify_token_urlcoded = urlencode($verify_token->jwt);
         $redirect_url = "{$state_payload['domain']}/wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
 
