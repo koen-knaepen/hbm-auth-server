@@ -17,7 +17,6 @@ class HBM_Server_Auth_Admin_Shortcodes extends HBM_Class_Handler
     {
         return [
             'pattern' => 'singleton',
-            '__log' => ['name'],
             '__ticket' =>
             ['Entry' => ['is_admin']],
         ];
