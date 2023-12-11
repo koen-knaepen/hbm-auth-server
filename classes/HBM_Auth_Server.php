@@ -18,6 +18,10 @@ class HBM_Auth_Server extends HBM_Root
         HBM_Callback_Initiate::HBM()::get_instance();
         HBM_Callback_Set_Sso::HBM()::get_instance();
         HBM_Callback_Logout::HBM()::get_instance();
-        return array_merge(parent::set_pattern(), []);
+        return array_merge(parent::set_pattern(), [
+            '__ticket' => [
+                'Entry' => ['_FALSE_']
+            ],
+        ]);
     }
 }
