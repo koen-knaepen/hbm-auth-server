@@ -3,10 +3,10 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use function HBM\hbm_echo_modal;
-use function HBM\hbm_set_headers;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\helpers\WP_Rest_Modal;
+
 
 
 /**
@@ -28,6 +28,10 @@ class HBM_Callback_Logout extends HBM_Class_Handler
 
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
+    }
+    use WP_Rest_Modal {
+        hbm_set_headers as private;
+        hbm_echo_modal as private;
     }
 
     private $plugin_utils;
@@ -96,9 +100,9 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Logout request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
-            hbm_echo_modal($logout_url, $message);
+            $this->hbm_echo_modal($logout_url, $message);
         } else {
-            hbm_set_headers();
+            $this->hbm_set_headers();
             echo "<script type='text/javascript'>window.location.href = '{$logout_url}';</script>";
         }
     }

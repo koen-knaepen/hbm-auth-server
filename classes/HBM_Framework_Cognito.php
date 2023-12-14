@@ -58,7 +58,7 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
       if ($test_server) {
          $sso_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_domain')->get_raw_data();
       } else {
-         $sso_server = hbm_get_current_domain() . '/';
+         $sso_server = \home_url() . '/';
       }
       $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/callback'; // Construct the redirect URL based on the site's domain
       $userpool_region = $application['cognito_aws_regio'];

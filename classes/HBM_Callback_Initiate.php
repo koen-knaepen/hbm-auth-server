@@ -3,14 +3,11 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use function HBM\hbm_echo_modal;
-use function HBM\hbm_set_headers;
-use function HBM\hbm_extract_domain;
-use function HBM\hbm_get_current_domain;
 use HBM\Cookies_And_Sessions\HBM_Session;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
+use HBM\helpers\WP_Rest_Modal;
 
 
 /**
@@ -24,12 +21,16 @@ use HBM\Database_Sessions\Pods_Session_Factory;
 
 class HBM_Callback_Initiate extends HBM_Class_Handler
 {
-
     use HBM_Session {
         browser_transient as private;
     }
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
+    }
+
+    use WP_Rest_Modal {
+        hbm_set_headers as private;
+        hbm_echo_modal as private;
     }
 
     private $plugin_utils;
@@ -116,9 +117,9 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         if ($state_payload['mode'] == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"
                 . "<p>Initatiate request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
-            hbm_echo_modal($initiate_endpoint, $message);
+            $this->hbm_echo_modal($initiate_endpoint, $message);
         } else {
-            hbm_set_headers();
+            $this->hbm_set_headers();
             echo "<script type='text/javascript'>window.location.href = '{$initiate_endpoint}';</script>";
         }
     }
@@ -130,7 +131,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         if ($test_server) {
             $sso_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_domain')->get_raw_data();
         } else {
-            $sso_server = hbm_get_current_domain() . '/';
+            $sso_server = \home_url() . '/';
         }
         if ($action == 'logout') {
             $redirect_url = $sso_server . 'wp-json/hbm-auth-server/v1/framework_logout?app=' . $application['id']; // Construct the logout URL based on the sso server's domain

@@ -4,13 +4,12 @@ namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
-use function HBM\hbm_echo_modal;
-use function HBM\hbm_set_headers;
-use function HBM\hbm_get_current_domain;
+use HBM\helpers\HBM_Main_Utils;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
 use \HBM\Cookies_And_Sessions\HBM_Session;
+use HBM\helpers\WP_Rest_Modal;
 
 /**
  * Summary of class-hbm-callback-api
@@ -30,6 +29,15 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
     }
+
+    use HBM_Main_Utils {
+        hbm_get_current_domain as private;
+    }
+    use WP_Rest_Modal {
+        hbm_set_headers as private;
+        hbm_echo_modal as private;
+    }
+
     private $sso_user_session = null;
     private $plugin_utils;
     private object $state_manager;
@@ -129,7 +137,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         $verified_user = $this->hbm_extract_payload($id_token);
         $framework_user = $framework_api->transform_to_wp_user($verified_user, $state_payload);
         //create a JWT token that can be verified on return
-        $site_domain = hbm_get_current_domain();
+        $site_domain = $this->hbm_get_current_domain();
         $verify_payload = array(
             'role' => 'subscriber',
             'time' => time(),
@@ -150,9 +158,9 @@ class HBM_Callback_Handler extends HBM_Class_Handler
                 . "<p>Authentication from {$framework_context->label} received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"
                 . "<p>{$framework_context->label} user: </p><pre>" . json_encode($verified_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>'
                 . "<p>WP user: </p><pre>" . json_encode($framework_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
-            hbm_echo_modal($redirect_url, $message);
+            $this->hbm_echo_modal($redirect_url, $message);
         } else {
-            hbm_set_headers();
+            $this->hbm_set_headers();
             echo "<script type='text/javascript'>    window.location.href = '{$redirect_url}}';</script>";
         }
     }

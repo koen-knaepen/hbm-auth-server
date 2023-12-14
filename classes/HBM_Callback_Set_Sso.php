@@ -3,13 +3,12 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use function HBM\hbm_echo_modal;
-use function HBM\hbm_set_headers;
 use \HBM\Cookies_And_Sessions\HBM_Session;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_Data_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
+use HBM\helpers\WP_Rest_Modal;
 
 
 /**
@@ -30,6 +29,9 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
 
     use HBM_Data_Helpers {
         hbm_extract_payload as private;
+    }
+    use WP_Rest_Modal {
+        hbm_echo_modal as private;
     }
 
     /**
@@ -130,11 +132,7 @@ class HBM_Callback_Set_Sso extends HBM_Class_Handler
                 . "<p>Access Code is decoded and valid: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>"
                 . "<p>{$framework_context->label} user: </p><pre>" . json_encode($framework_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>'
                 . "<p>SSO user: </p><pre>" . json_encode($sso_user, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
-            hbm_echo_modal(null, $message);
+            $this->hbm_echo_modal(null, $message);
         }
-        // else {
-        //     hbm_set_headers();
-        //     echo "<script type='text/javascript'>    window.close();</script>";
-        // }
     }
 }
