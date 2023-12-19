@@ -94,7 +94,7 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         }
         $state_payload = $this->hbm_extract_payload($state);
         $mode = $state_payload['mode'];
-        $logout_url = "{$state_payload['domain']}/wp-json/hbm-auth-client/v1/logout-client?state={$state}";
+        $logout_url = "{$state_payload['domain']}wp-json/hbm-auth-client/v1/logout-client?state={$state}";
         $this->sso_user_session->logout_sso_user();
         $this->transient->delete('sso_logout');
         if ($mode == 'test') {
