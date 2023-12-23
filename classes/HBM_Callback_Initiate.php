@@ -5,7 +5,7 @@ namespace HBM\auth_server;
 use HBM\Instantiations\HBM_Class_Handler;
 use HBM\Cookies_And_Sessions\HBM_Session;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
-use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
 use HBM\helpers\WP_Rest_Modal;
 
@@ -24,7 +24,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     use HBM_Session {
         browser_transient as private;
     }
-    use HBM_Data_Helpers {
+    use HBM_JWT_Helpers {
         hbm_extract_payload as private;
     }
 

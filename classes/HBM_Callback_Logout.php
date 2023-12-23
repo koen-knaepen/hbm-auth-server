@@ -4,7 +4,7 @@ namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
-use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\helpers\WP_Rest_Modal;
 
 
@@ -26,7 +26,7 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         user_session as private;
     }
 
-    use HBM_Data_Helpers {
+    use HBM_JWT_Helpers {
         hbm_extract_payload as private;
     }
     use WP_Rest_Modal {

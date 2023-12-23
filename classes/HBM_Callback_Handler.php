@@ -6,7 +6,7 @@ use HBM\Instantiations\HBM_Class_Handler;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use HBM\helpers\HBM_Main_Utils;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
-use HBM\Data_Handlers\HBM_Data_Helpers;
+use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
 use \HBM\Cookies_And_Sessions\HBM_Session;
 use HBM\helpers\WP_Rest_Modal;
@@ -26,7 +26,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         user_session as private;
     }
 
-    use HBM_Data_Helpers {
+    use HBM_JWT_Helpers {
         hbm_extract_payload as private;
     }
 
