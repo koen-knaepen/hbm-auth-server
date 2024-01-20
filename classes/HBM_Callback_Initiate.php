@@ -36,14 +36,16 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     private $plugin_utils;
     private $sso_user_session = null;
     private $transient = null;
-    private object $pods_session;
+    private object $applications;
+    private object $settings;
 
     public function __construct()
     {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->transient = $this->browser_transient();
         $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
-        $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
+        $this->applications = Pods_Session_Factory::HBM()::get_instance()->HBM_pod('hbm-auth-server-site', null);
+        $this->settings = Pods_Session_Factory::HBM()::get_instance()->HBM_Setting('hbm-auth-server');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -64,7 +66,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_application($input_domain)
     {
-        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $input_domain])->get_raw_data();
+        $application = $this->applications->findKey(['name' => $input_domain])->get_raw_data_field('application');
         if ($application) {
             return $application;
         } else {
@@ -127,9 +129,9 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_redirect_url($action, $application)
     {
-        $test_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_server')->get_raw_data();
+        $test_server = $this->settings->get_raw_data_field('test_server');
         if ($test_server) {
-            $sso_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_domain')->get_raw_data();
+            $sso_server = $this->settings->get_raw_data_field('test_domain');
         } else {
             $sso_server = \home_url() . '/';
         }

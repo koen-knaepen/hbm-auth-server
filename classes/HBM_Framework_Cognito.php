@@ -7,12 +7,12 @@ use HBM\Database_Sessions\Pods_Session_Factory;
 class HBM_Framework_Cognito extends HBM_Auth_Framework
 {
 
-   private object $pods_session;
+   private object $settings;
 
 
    public function __construct()
    {
-      $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
+      $this->settings = Pods_Session_Factory::HBM()::get_instance()->HBM_Setting('hbm-auth-server');
    }
 
    protected function set_context(): array
@@ -54,9 +54,9 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
 
    public function exchange_code_for_tokens($code, $application)
    {
-      $test_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_server')->get_raw_data();
+      $test_server = $this->settings->get_raw_data_field('test_server');
       if ($test_server) {
-         $sso_server = $this->pods_session->HBM_setting('hbm-auth-server', 'test_domain')->get_raw_data();
+         $sso_server = $this->settings->get_raw_data_field('test_domain');
       } else {
          $sso_server = \home_url() . '/';
       }

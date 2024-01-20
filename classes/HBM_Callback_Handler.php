@@ -41,7 +41,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     private $sso_user_session = null;
     private $plugin_utils;
     private object $state_manager;
-    private object $pods_session;
+    private object $applications;
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -52,7 +52,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         $this->sso_user_session = $this->user_session();
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->state_manager = HBM_State_Manager::HBM()::get_instance();
-        $this->pods_session = Pods_Session_Factory::HBM()::get_instance();
+        $this->applications = Pods_Session_Factory::HBM()::get_instance()->HBM_pod('hbm-auth-server-site', null);
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -70,12 +70,13 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         return HBM_Auth_Framework::get_instance($framework);
     }
 
-    private function get_application($input_domain)
+    private function get_application($domain)
     {
-        $domain = $input_domain;
-        $application = $this->pods_session->HBM_pod('hbm-auth-server-site', 'application', ['name' => $domain])->get_raw_data();
+
+        $application = $this->applications->findKey(['name' => $domain])->get_raw_data_field('application');
         if ($application) {
             $this->sso_user_session->set_application($application['id']);
+            error_log("Application found for domain {$domain}: " . print_r($application, true));
             return $application;
         } else {
             throw new \Exception("No application found for domain {$domain}, please see the administrator");
