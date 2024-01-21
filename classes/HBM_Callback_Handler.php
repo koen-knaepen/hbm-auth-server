@@ -76,10 +76,9 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         $application = $this->applications->findKey(['name' => $domain])->get_raw_data_field('application');
         if ($application) {
             $this->sso_user_session->set_application($application['id']);
-            error_log("Application found for domain {$domain}: " . print_r($application, true));
             return $application;
         } else {
-            throw new \Exception("No application found for domain {$domain}, please see the administrator");
+            $this->logger->message('No application found for domain ' . $domain . ', please see the administrator', E_USER_ERROR, 'error');
         }
     }
 
