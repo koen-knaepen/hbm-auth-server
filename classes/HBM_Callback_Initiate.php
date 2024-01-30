@@ -49,7 +49,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
-    protected static function set_pattern(): array
+    protected static function set_pattern($options = []): array
     {
         return [
             'pattern' => 'singleton',

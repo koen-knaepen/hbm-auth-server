@@ -11,7 +11,7 @@ use HBM\Pods_Helpers\Watch_Pod;
 
 class HBM_Auth_Server extends HBM_Root
 {
-    protected static function set_pattern(): array
+    protected static function set_pattern($options = []): array
     {
         HBM_Server_Auth_Admin::HBM()::get_instance();
         HBM_Callback_Handler::HBM()::get_instance();
