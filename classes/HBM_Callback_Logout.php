@@ -5,7 +5,7 @@ namespace HBM\auth_server;
 use HBM\Instantiations\HBM_Class_Handler;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
-use HBM\helpers\WP_Rest_Modal;
+use HBM\Helpers\WP_Rest_Modal;
 
 
 

@@ -4,12 +4,12 @@ namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
 use \HBM\Cookies_And_Sessions\HBM_State_Manager;
-use HBM\helpers\HBM_Main_Utils;
+use HBM\Helpers\HBM_Main_Utils;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
 use \HBM\Cookies_And_Sessions\HBM_Session;
-use HBM\helpers\WP_Rest_Modal;
+use HBM\Helpers\WP_Rest_Modal;
 
 /**
  * Summary of class-hbm-callback-api

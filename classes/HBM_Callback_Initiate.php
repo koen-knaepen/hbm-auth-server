@@ -7,7 +7,7 @@ use HBM\Cookies_And_Sessions\HBM_Session;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
-use HBM\helpers\WP_Rest_Modal;
+use HBM\Helpers\WP_Rest_Modal;
 
 
 /**
