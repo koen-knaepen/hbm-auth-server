@@ -8,7 +8,7 @@ use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
 use HBM\helpers\WP_Rest_Modal;
-
+use HBM\Loader\Browser\Transients;
 
 /**
  * Summary of class-hbm-callback-api
@@ -21,12 +21,12 @@ use HBM\helpers\WP_Rest_Modal;
 
 class HBM_Callback_Initiate extends HBM_Class_Handler
 {
-    use HBM_Session {
-        browser_transient as private;
-    }
-    use HBM_JWT_Helpers {
-        hbm_extract_payload as private;
-    }
+    // use HBM_Session {
+    //     browser_transient as private;
+    // }
+    // use HBM_JWT_Helpers {
+    //     hbm_extract_payload as private;
+    // }
 
     use WP_Rest_Modal {
         hbm_set_headers as private;
@@ -34,18 +34,24 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     }
 
     private $plugin_utils;
-    private $sso_user_session = null;
+    private $user = null;
+    private $state = null;
     private $transient = null;
-    private object $applications;
-    private object $settings;
+    private  $applications;
+    private  $settings;
 
     public function __construct()
     {
+        $this->add_to_dna([$this, 'init_pofs']);
+    }
+
+    public function init_pofs()
+    {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
-        $this->transient = $this->browser_transient();
-        $this->transient->set_policy(false, 5 * \MINUTE_IN_SECONDS);
         $this->applications = Pods_Session_Factory::HBM()::get_instance()->HBM_pod('hbm-auth-server-site', null);
-        $this->settings = Pods_Session_Factory::HBM()::get_instance()->HBM_Setting('hbm-auth-server');
+        $this->transient = Transients::HBM()::get_instance();
+        $this->state = $this->pof('state');
+        $this->settings = $this->pof('settings');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
@@ -55,6 +61,15 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
             'pattern' => 'singleton',
             '__ticket' =>
             ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'initiate']]],
+            '__inject' => [
+                'jwtCreation?state',
+                'hbmAuthServerSettings?settings' => [
+                    'WPSettings' => [
+                        'identifier' => 'HBM_AUTH_SERVER_SETTINGS',
+                        'group' => 'hbm-auth-server_',
+                    ]
+                ]
+            ]
         ];
     }
 
@@ -114,7 +129,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload['action'], $redirect_url, $state_urlcoded, $application);
         if ($state_payload['action'] == 'logout') {
-            $this->transient->set("sso_logout", $state_urlcoded);
+            $this->transient->tset("sso_logout", $state_urlcoded);
         }
         if ($state_payload['mode'] == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"
@@ -129,9 +144,9 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_redirect_url($action, $application)
     {
-        $test_server = $this->settings->get_raw_data_field('test_server');
+        $test_server = $this->settings->fuse('test_server', false);
         if ($test_server) {
-            $sso_server = $this->settings->get_raw_data_field('test_domain');
+            $sso_server = $this->settings->fuse('test_domain');
         } else {
             $sso_server = \home_url() . '/';
         }

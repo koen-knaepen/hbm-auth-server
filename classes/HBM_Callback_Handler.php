@@ -9,7 +9,8 @@ use \HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
 use \HBM\Cookies_And_Sessions\HBM_Session;
-use HBM\helpers\WP_Rest_Modal;
+use HBM\Helpers\WP_Rest_Modal;
+use HBM\Data_Handlers\Data_Storage\Pods_Storage;
 
 /**
  * Summary of class-hbm-callback-api
@@ -58,6 +59,12 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     protected static function set_pattern($options = []): array
     {
+        $sites = [
+            'class' => Pods_Storage::class,
+            'get_instance' => [
+                'pod_name' => 'hbm-auth-server-site'
+            ]
+        ];
         return [
             'pattern' => 'singleton',
             '__ticket' => ['Entry' => ['is_api',  ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'callback']]],
