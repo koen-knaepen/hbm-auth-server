@@ -83,7 +83,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     private function init_auth_framework($application)
     {
         $framework = $application['app_framework'];
-        return HBM_Auth_Framework::get_instance($framework);
+        return HBM_Auth_Framework::HBM(['framework' => $framework])::get_instance();
     }
 
     private function get_application($input_domain)
@@ -96,10 +96,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
             throw new \Exception("No application found for domain {$input_domain}, please see the administrator");
         }
     }
-    public function enqueue_auth_script()
-    {
-    }
-
 
     /**
      * Summary of hbm_register_callback_endpoint
@@ -137,6 +133,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         $redirect_url = $this->get_redirect_url($state_payload['action'], $application);
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload['action'], $redirect_url, $state_urlcoded, $application);
+        error_log("Initiate endpoint: " . $initiate_endpoint);
         if ($state_payload['action'] == 'logout') {
             $this->transient->tset("sso_logout", $state_urlcoded);
         }
