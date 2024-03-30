@@ -48,7 +48,7 @@ abstract class HBM_Auth_Framework
         $requiredKeys = ['name', 'label', 'auth_id_name'];
         foreach ($requiredKeys as $key) {
             if (!array_key_exists($key, $context)) {
-                throw new Exception("Key {$key} is missing in the context.");
+                throw new \Exception("Key {$key} is missing in the context.");
             }
         }
 

@@ -4,6 +4,7 @@ namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
 use HBM\Cookies_And_Sessions\HBM_Session;
+use HBM\Data_Handlers\Data_Middleware\Data_JWT_Transformation;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
@@ -37,7 +38,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     private $user = null;
     private $state = null;
     private $transient = null;
-    private  $applications;
+    private  $sites;
     private  $settings;
 
     public function __construct()
@@ -48,7 +49,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     public function init_pofs()
     {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
-        $this->applications = Pods_Session_Factory::HBM()::get_instance()->HBM_pod('hbm-auth-server-site', null);
+        $this->sites = $this->pof('sites');
         $this->transient = Transients::HBM()::get_instance();
         $this->state = $this->pof('state');
         $this->settings = $this->pof('settings');
@@ -64,11 +65,17 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
             '__inject' => [
                 'jwtCreation?state',
                 'hbmAuthServerSettings?settings' => [
-                    'WPSettings' => [
+                    'WPSettings', [
                         'identifier' => 'HBM_AUTH_SERVER_SETTINGS',
                         'group' => 'hbm-auth-server_',
                     ]
-                ]
+                ],
+                'authServerApplications?sites' => [
+                    'podsStorage', [
+                        'identifier' => 'HBM_AUTH_SERVER_SITES',
+                        'podName' => 'hbm-auth-server-site'
+                    ]
+                ],
             ]
         ];
     }
@@ -81,7 +88,8 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private function get_application($input_domain)
     {
-        $application = $this->applications->findKey(['name' => $input_domain])->get_raw_data_field('application');
+        $site = $this->sites->findOne(['name' => $input_domain]);
+        $application = $this->sites->fget($site, 'application');
         if ($application) {
             return $application;
         } else {
@@ -119,8 +127,9 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     {
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
-        $state_payload = $this->hbm_extract_payload($state);
-        $application = $this->get_application($state_payload['domain']);
+        $state_payload = Data_JWT_Transformation::spayload($state)['data'] ?? [];
+        $domain = $state_payload['domain'] ?? null;
+        $application = $this->get_application($domain);
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
