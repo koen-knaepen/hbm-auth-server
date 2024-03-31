@@ -36,7 +36,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private $plugin_utils;
     private $user = null;
-    private $state = null;
     private $transient = null;
     private  $sites;
     private  $settings;
@@ -51,7 +50,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->sites = $this->pof('sites');
         $this->transient = Transients::HBM()::get_instance();
-        $this->state = $this->pof('state');
         $this->settings = $this->pof('settings');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
@@ -63,7 +61,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
             '__ticket' =>
             ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'initiate']]],
             '__inject' => [
-                'jwtCreation?state',
                 'hbmAuthServerSettings?settings' => [
                     'WPSettings', [
                         'identifier' => 'HBM_AUTH_SERVER_SETTINGS',
@@ -71,7 +68,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
                     ]
                 ],
                 'authServerApplications?sites' => [
-                    'podsStorage', [
+                    'pods', [
                         'identifier' => 'HBM_AUTH_SERVER_SITES',
                         'podName' => 'hbm-auth-server-site'
                     ]
@@ -133,7 +130,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         $redirect_url = $this->get_redirect_url($state_payload['action'], $application);
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload['action'], $redirect_url, $state_urlcoded, $application);
-        error_log("Initiate endpoint: " . $initiate_endpoint);
         if ($state_payload['action'] == 'logout') {
             $this->transient->tset("sso_logout", $state_urlcoded);
         }

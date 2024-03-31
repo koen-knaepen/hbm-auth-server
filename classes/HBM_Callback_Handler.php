@@ -3,14 +3,10 @@
 namespace HBM\auth_server;
 
 use HBM\Instantiations\HBM_Class_Handler;
-use \HBM\Cookies_And_Sessions\HBM_State_Manager;
 use HBM\helpers\HBM_Main_Utils;
 use \HBM\Plugin_Management\HBM_Plugin_Utils;
-use HBM\Data_Handlers\HBM_JWT_Helpers;
-use HBM\Database_Sessions\Pods_Session_Factory;
-use \HBM\Cookies_And_Sessions\HBM_Session;
+use HBM\Data_Handlers\Data_Middleware\Data_JWT_Transformation;
 use HBM\Helpers\WP_Rest_Modal;
-use HBM\Data_Handlers\Data_Storage\Pods_Storage;
 
 /**
  * Summary of class-hbm-callback-api
@@ -23,14 +19,6 @@ use HBM\Data_Handlers\Data_Storage\Pods_Storage;
 
 class HBM_Callback_Handler extends HBM_Class_Handler
 {
-    use HBM_Session {
-        user_session as private;
-    }
-
-    use HBM_JWT_Helpers {
-        hbm_extract_payload as private;
-    }
-
     use HBM_Main_Utils {
         hbm_get_current_domain as private;
     }
@@ -41,8 +29,10 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     private $sso_user_session = null;
     private $plugin_utils;
-    private object $state_manager;
-    private object $applications;
+    private $state;
+    private $secret_id;
+    private  $sites;
+    private $transient;
     /**
      * Summary of _deprecated_constructor
      * 1. Register the callback endpoint
@@ -50,42 +40,59 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     public function __construct()
     {
-        $this->sso_user_session = $this->user_session();
+        $this->add_to_dna([$this, 'init_pofs']);
+    }
+
+    public function init_pofs()
+    {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
-        $this->state_manager = HBM_State_Manager::HBM()::get_instance();
-        $this->applications = Pods_Session_Factory::HBM()::get_instance()->HBM_pod('hbm-auth-server-site', null);
+        $this->sso_user_session = $this->pof('users');
+        $this->sites = $this->pof('sites');
+        $this->state = $this->pof('state');
+        $this->secret_id = $this->pof('secretId');
+        $this->transient = $this->pof('transient');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
     protected static function set_pattern($options = []): array
     {
-        $sites = [
-            'class' => Pods_Storage::class,
-            'get_instance' => [
-                'pod_name' => 'hbm-auth-server-site'
-            ]
-        ];
+        $session_expire = 24 * 60 * 60;
         return [
             'pattern' => 'singleton',
             '__ticket' => ['Entry' => ['is_api',  ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'callback']]],
+            '__inject' => [
+                'jwtCreation?state',
+                'jwtSecretId?secretId',
+                'transientAttribute?transient',
+                'WPSettings:hbmAuthServerSettings?settings',
+                'pods:authServerApplications?sites',
+                'user?users' => [
+                    'browser', [
+                        'scope' => 'hbm-user',
+                        'sessionIdentifier' => 'HBM_USERS',
+                        'sessionExpire' => $session_expire,
+                    ]
+                ],
+            ]
         ];
     }
 
     private function init_auth_framework($application)
     {
         $framework = $application['app_framework'];
-        return HBM_Auth_Framework::get_instance($framework);
+        return HBM_Auth_Framework::HBM(['framework' => $framework])::get_instance();
     }
 
     private function get_application($domain)
     {
 
-        $application = $this->applications->findKey(['name' => $domain])->get_raw_data_field('application');
+        $site = $this->sites->findOne(['name' => $domain]);
+        $application = $this->sites->fget($site, 'application');
         if ($application) {
-            $this->sso_user_session->set_application($application['id']);
+            // $this->sso_user_session->set_application($application['id']);
             return $application;
         } else {
-            $this->logger->message('No application found for domain ' . $domain . ', please see the administrator', E_USER_ERROR, 'error');
+            $this->logger('No application found for domain ' . $domain . ', please see the administrator', '', 'error');
         }
     }
 
@@ -121,7 +128,8 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         // Get the authorization code from Framework
         $state_urlcoded = $request->get_param('state');
         $state = urldecode($state_urlcoded);
-        $state_payload = $this->hbm_extract_payload($state);
+        $state_payload = Data_JWT_Transformation::spayload($state)['data'] ?? [];
+
         $code = $request->get_param('code');
 
         if (empty($code)) {
@@ -141,23 +149,26 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         }
 
         $id_token = $tokens['id_token'];
-        $verified_user = $this->hbm_extract_payload($id_token);
+        $verified_user = Data_JWT_Transformation::spayload($id_token);
         $framework_user = $framework_api->transform_to_wp_user($verified_user, $state_payload);
         //create a JWT token that can be verified on return
         $site_domain = $this->hbm_get_current_domain();
+        $auth_domain = static::get_auth_object_property('Entry', '_url');
         $verify_payload = array(
             'role' => 'subscriber',
             'time' => time(),
-            'auth_domain' => $site_domain,
+            'auth_domain' => $auth_domain,
             'origin_domain' => $state_payload['domain'],
             'action' => $state_payload['action'],
             'mode' => $state_payload['mode'],
         ) + (array) $framework_user;
-        $this->sso_user_session->set_sso_user($verify_payload);
+        $this->sso_user_session->fstowall($verify_payload);
 
-        $verify_token = json_decode($this->state_manager->encode_transient_jwt($verify_payload,  'hbm-auth-access-', false));
-        $verify_token_urlcoded = urlencode($verify_token->jwt);
-        $redirect_url = "{$state_payload['domain']}wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
+        $verify_token = $this->state->encode($verify_payload);
+        $secret_id = $this->secret_id->get_key();
+        $this->transient->del($secret_id);
+        $verify_token_urlcoded = urlencode($verify_token);
+        $redirect_url = $state_payload['domain'] . "wp-json/hbm-auth-client/v1/validate_token?state={$state_urlcoded}&access_code={$verify_token_urlcoded}";
 
         if ($state_payload['mode'] == 'test') {
 
