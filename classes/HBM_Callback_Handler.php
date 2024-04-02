@@ -63,16 +63,10 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             '__inject' => [
                 'jwtCreation?state',
                 'jwtSecretId?secretId',
-                'transientAttribute?transient',
                 'WPSettings:hbmAuthServerSettings?settings',
                 'pods:authServerApplications?sites',
-                'user?users' => [
-                    'browser', [
-                        'scope' => 'hbm-user',
-                        'sessionIdentifier' => 'HBM_USERS',
-                        'sessionExpire' => $session_expire,
-                    ]
-                ],
+                'browser:user?users',
+                'transientAttribute?transient',
             ]
         ];
     }
@@ -152,7 +146,6 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         $verified_user = Data_JWT_Transformation::spayload($id_token);
         $framework_user = $framework_api->transform_to_wp_user($verified_user, $state_payload);
         //create a JWT token that can be verified on return
-        $site_domain = $this->hbm_get_current_domain();
         $auth_domain = static::get_auth_object_property('Entry', '_url');
         $verify_payload = array(
             'role' => 'subscriber',
@@ -161,8 +154,10 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             'origin_domain' => $state_payload['domain'],
             'action' => $state_payload['action'],
             'mode' => $state_payload['mode'],
+            'application' => $application['id'],
         ) + (array) $framework_user;
         $this->sso_user_session->fstowall($verify_payload);
+        error_log("----> user id: " . print_r($this->sso_user_session->release_key(), true));
 
         $verify_token = $this->state->encode($verify_payload);
         $secret_id = $this->secret_id->get_key();

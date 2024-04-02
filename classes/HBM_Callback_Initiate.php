@@ -37,6 +37,7 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     private $plugin_utils;
     private $user = null;
     private $transient = null;
+    private $user_transient = null;
     private  $sites;
     private  $settings;
 
@@ -50,12 +51,14 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->sites = $this->pof('sites');
         $this->transient = Transients::HBM()::get_instance();
+        $this->user_transient = $this->pof('userTransient');
         $this->settings = $this->pof('settings');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
     protected static function set_pattern($options = []): array
     {
+        $session_expire = 24 * 60 * 60;
         return [
             'pattern' => 'singleton',
             '__ticket' =>
@@ -73,6 +76,26 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
                         'podName' => 'hbm-auth-server-site'
                     ]
                 ],
+                'user?users' => [
+                    'browser', [
+                        'scope' => 'hbm-user',
+                        'sessionIdentifier' => 'HBM_USERS',
+                        'sessionExpire' => $session_expire,
+                        'cookieOptions' => [
+                            'sameSite' => 'Lax',
+                            'httpOnly' => true,
+                            'path' => '/',
+                            'expire_time' => $session_expire,
+                        ]
+                    ]
+                ],
+                'user?userTransient' => [
+                    'transientAttribute', [
+                        'identifier' => 'USERS',
+                        'browser' => 'browser:user'
+                    ]
+                ],
+
             ]
         ];
     }
@@ -131,7 +154,8 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload['action'], $redirect_url, $state_urlcoded, $application);
         if ($state_payload['action'] == 'logout') {
-            $this->transient->tset("sso_logout", $state_urlcoded);
+            error_log("----> users: " . print_r($this->users_release_key(), true));
+            $this->user_transient->set("sso_logout", $state_urlcoded);
         }
         if ($state_payload['mode'] == 'test') {
             $message = "<h3>You are on the SSO Server (first time)</h3>"
