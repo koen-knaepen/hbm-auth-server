@@ -36,7 +36,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     private $plugin_utils;
     private $user = null;
-    private $transient = null;
     private $user_transient = null;
     private  $sites;
     private  $settings;
@@ -50,7 +49,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
         $this->sites = $this->pof('sites');
-        $this->transient = Transients::HBM()::get_instance();
         $this->user_transient = $this->pof('userTransient');
         $this->settings = $this->pof('settings');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
@@ -76,23 +74,26 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
                         'podName' => 'hbm-auth-server-site'
                     ]
                 ],
-                'user?users' => [
+                'ssoUser?users' => [
                     'browser', [
                         'scope' => 'hbm-user',
                         'sessionIdentifier' => 'HBM_USERS',
+                        'globalSecretsIdentifier' => 'HBM_GLOBAL_USERS_SECRET',
                         'sessionExpire' => $session_expire,
                         'cookieOptions' => [
                             'sameSite' => 'Lax',
                             'httpOnly' => true,
+                            'secure' => true,
                             'path' => '/',
                             'expire_time' => $session_expire,
                         ]
                     ]
                 ],
+                'browserCookie:ssoUser?cookie',
                 'user?userTransient' => [
                     'transientAttribute', [
                         'identifier' => 'USERS',
-                        'browser' => 'browser:user'
+                        'browser' => 'browser:ssoUser'
                     ]
                 ],
 
@@ -154,7 +155,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
         $initiate_endpoint = $framework_api->create_auth_endpoint($state_payload['action'], $redirect_url, $state_urlcoded, $application);
         if ($state_payload['action'] == 'logout') {
-            error_log("----> users: " . print_r($this->users_release_key(), true));
             $this->user_transient->set("sso_logout", $state_urlcoded);
         }
         if ($state_payload['mode'] == 'test') {

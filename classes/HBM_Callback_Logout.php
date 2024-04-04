@@ -54,7 +54,8 @@ class HBM_Callback_Logout extends HBM_Class_Handler
             '__ticket' =>
             ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'framework_logout']]],
             '__inject' => [
-                'browser:user?users',
+                'browser:ssoUser?users',
+                'browserCookie:ssoUser?cookie',
                 'transientAttribute:user?transient'
             ]
         ];
@@ -85,20 +86,18 @@ class HBM_Callback_Logout extends HBM_Class_Handler
     public function handle_framework_logout(\WP_REST_Request $request)
     {
         $application = $request->get_param('app');
-        error_log("USER ID: " . print_r($this->sso_user_session->release_key(), true));
         if (!isset($application)) {
             return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
         }
-        // $this->sso_user_session->set_application($application);
         $state = $this->user_transient->get('sso_logout', false);
         if (!$state) {
             return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
-        $state_payload = Data_JWT_Transformation::spayload($state);
+        $state_payload = Data_JWT_Transformation::spayload($state)['data'];
         $mode = $state_payload['mode'];
         $logout_url = "{$state_payload['domain']}wp-json/hbm-auth-client/v1/logout-client?state={$state}";
-        $this->sso_user_session->fdestroyall();
         $this->user_transient->del('sso_logout');
+        $this->sso_user_session->fdestroyall();
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Logout request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";

@@ -61,12 +61,18 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             'pattern' => 'singleton',
             '__ticket' => ['Entry' => ['is_api',  ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'callback']]],
             '__inject' => [
-                'jwtCreation?state',
-                'jwtSecretId?secretId',
+                'user?state' => [
+                    'jwtCreation', [
+                        'identifier' => 'USER',
+                        'browser' => 'browser:ssoUser',
+                    ]
+                ],
+                'jwtSecretId:user?secretId',
                 'WPSettings:hbmAuthServerSettings?settings',
                 'pods:authServerApplications?sites',
-                'browser:user?users',
-                'transientAttribute?transient',
+                'browser:ssoUser?users',
+                'browserCookie:ssoUser?cookie',
+                'transientAttribute:user?transient',
             ]
         ];
     }
@@ -133,6 +139,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
+        error_log("Cookie: " . $this->cookie_get_key());
         $framework_api = $this->init_auth_framework($application);
         // Exchange the authorization code for tokens
         $tokens = $framework_api->exchange_code_for_tokens($code, $application);
@@ -157,7 +164,6 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             'application' => $application['id'],
         ) + (array) $framework_user;
         $this->sso_user_session->fstowall($verify_payload);
-        error_log("----> user id: " . print_r($this->sso_user_session->release_key(), true));
 
         $verify_token = $this->state->encode($verify_payload);
         $secret_id = $this->secret_id->get_key();
