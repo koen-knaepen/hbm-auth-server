@@ -54,9 +54,8 @@ class HBM_Callback_Logout extends HBM_Class_Handler
             '__ticket' =>
             ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'framework_logout']]],
             '__inject' => [
-                'browser:ssoUser?users',
-                'browserCookie:ssoUser?cookie',
-                'transientAttribute:user?transient'
+                'transientAttribute:user?transient',
+                'transientCodedFields:ssoUser?users'
             ]
         ];
     }
@@ -97,7 +96,7 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         $mode = $state_payload['mode'];
         $logout_url = "{$state_payload['domain']}wp-json/hbm-auth-client/v1/logout-client?state={$state}";
         $this->user_transient->del('sso_logout');
-        $this->sso_user_session->fdestroyall();
+        $this->sso_user_session->fdelall($application);
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Logout request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";

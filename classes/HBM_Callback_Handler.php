@@ -27,6 +27,7 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         hbm_echo_modal as private;
     }
 
+    private $apps;
     private $sso_user_session = null;
     private $plugin_utils;
     private $state;
@@ -46,7 +47,9 @@ class HBM_Callback_Handler extends HBM_Class_Handler
     public function init_pofs()
     {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
+
         $this->sso_user_session = $this->pof('users');
+        $this->apps = $this->pof('apps');
         $this->sites = $this->pof('sites');
         $this->state = $this->pof('state');
         $this->secret_id = $this->pof('secretId');
@@ -56,7 +59,6 @@ class HBM_Callback_Handler extends HBM_Class_Handler
 
     protected static function set_pattern($options = []): array
     {
-        $session_expire = 24 * 60 * 60;
         return [
             'pattern' => 'singleton',
             '__ticket' => ['Entry' => ['is_api',  ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'callback']]],
@@ -70,9 +72,9 @@ class HBM_Callback_Handler extends HBM_Class_Handler
                 'jwtSecretId:user?secretId',
                 'WPSettings:hbmAuthServerSettings?settings',
                 'pods:authServerApplications?sites',
-                'browser:ssoUser?users',
-                'browserCookie:ssoUser?cookie',
+                'browser:ssoUser?apps',
                 'transientAttribute:user?transient',
+                'transientCodedFields:ssoUser?users'
             ]
         ];
     }
@@ -139,7 +141,10 @@ class HBM_Callback_Handler extends HBM_Class_Handler
         if (!$application) {
             new \WP_Error('no_site', 'No site found', array('status' => 400));
         }
-        error_log("Cookie: " . $this->cookie_get_key());
+        $this->apps->fstowall([
+            'last_app' => $application['id'],
+            'last_time' => time(),
+        ]);
         $framework_api = $this->init_auth_framework($application);
         // Exchange the authorization code for tokens
         $tokens = $framework_api->exchange_code_for_tokens($code, $application);
@@ -161,9 +166,8 @@ class HBM_Callback_Handler extends HBM_Class_Handler
             'origin_domain' => $state_payload['domain'],
             'action' => $state_payload['action'],
             'mode' => $state_payload['mode'],
-            'application' => $application['id'],
         ) + (array) $framework_user;
-        $this->sso_user_session->fstowall($verify_payload);
+        $this->sso_user_session->fsetall($application['id'], $verify_payload);
 
         $verify_token = $this->state->encode($verify_payload);
         $secret_id = $this->secret_id->get_key();
