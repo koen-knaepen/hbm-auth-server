@@ -23,12 +23,6 @@ use HBM\Loader\Browser\Transients;
 
 class HBM_Callback_Initiate extends HBM_Class_Handler
 {
-    // use HBM_Session {
-    //     browser_transient as private;
-    // }
-    // use HBM_JWT_Helpers {
-    //     hbm_extract_payload as private;
-    // }
 
     use WP_Rest_Modal {
         hbm_set_headers as private;
@@ -59,7 +53,6 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
     {
         $timestamp = HBM_Timestamp::HBM()::get_instance();
         $session_expire = $timestamp->timestamp('next-year', '23:59:59');
-        error_log("Session expire: " . $session_expire);
         return [
             'pattern' => 'singleton',
             '__ticket' =>
