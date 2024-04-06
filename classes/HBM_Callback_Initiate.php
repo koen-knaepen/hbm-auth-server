@@ -8,6 +8,7 @@ use HBM\Data_Handlers\Data_Middleware\Data_JWT_Transformation;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
 use HBM\Database_Sessions\Pods_Session_Factory;
+use HBM\Helpers\HBM_Timestamp;
 use HBM\helpers\WP_Rest_Modal;
 use HBM\Loader\Browser\Transients;
 
@@ -56,7 +57,9 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
 
     protected static function set_pattern($options = []): array
     {
-        $session_expire = 24 * 60 * 60;
+        $timestamp = HBM_Timestamp::HBM()::get_instance();
+        $session_expire = $timestamp->timestamp('next-year', '23:59:59');
+        error_log("Session expire: " . $session_expire);
         return [
             'pattern' => 'singleton',
             '__ticket' =>
@@ -74,11 +77,11 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
                         'podName' => 'hbm-auth-server-site'
                     ]
                 ],
-                'ssoUser?users' => [
+                'ssoUser?apps' => [
                     'browser', [
-                        'scope' => 'hbm-user',
-                        'sessionIdentifier' => 'HBM_USERS',
-                        'globalSecretsIdentifier' => 'HBM_GLOBAL_USERS_SECRET',
+                        'scope' => 'hbm-apps',
+                        'sessionIdentifier' => 'HBM_APPS',
+                        'globalSecretsIdentifier' => 'HBM_AUTH_APPS_SECRET',
                         'sessionExpire' => $session_expire,
                         'cookieOptions' => [
                             'sameSite' => 'Lax',
@@ -89,13 +92,22 @@ class HBM_Callback_Initiate extends HBM_Class_Handler
                         ]
                     ]
                 ],
-                'browserCookie:ssoUser?cookie',
                 'user?userTransient' => [
                     'transientAttribute', [
                         'identifier' => 'USERS',
                         'browser' => 'browser:ssoUser'
                     ]
                 ],
+                'ssoUser?users' => [
+                    'transientCodedFields', [
+                        'identifier' => 'CODED_USERS',
+                        'transientScope' => 'hbm-users',
+                        'browser' => 'browser:ssoUser',
+                        'sessionIdentifier' => 'CODED_TRANSIENT_USER_FIELDS',
+                        'globalSecretsIdentifier' => 'HBM_AUTH_TRANSIENT_FIELDS',
+                        'expire' => 7 * \DAY_IN_SECONDS
+                    ]
+                ]
 
             ]
         ];
