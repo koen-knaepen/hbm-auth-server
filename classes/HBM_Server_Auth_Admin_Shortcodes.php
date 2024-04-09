@@ -13,7 +13,7 @@ class HBM_Server_Auth_Admin_Shortcodes extends HBM_Class_Handler
         add_shortcode('hbm_callback_url', array($this, 'shortcode_callback'));
     }
 
-    protected static function set_pattern(): array
+    protected static function set_pattern($options = []): array
     {
         return [
             'pattern' => 'singleton',

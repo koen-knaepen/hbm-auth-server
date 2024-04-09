@@ -2,18 +2,8 @@
 
 namespace HBM\auth_server;
 
-use HBM\Database_Sessions\Pods_Session_Factory;
-
 class HBM_Framework_Cognito extends HBM_Auth_Framework
 {
-
-   private object $settings;
-
-
-   public function __construct()
-   {
-      $this->settings = Pods_Session_Factory::HBM()::get_instance()->HBM_Setting('hbm-auth-server');
-   }
 
    protected function set_context(): array
    {
@@ -54,9 +44,9 @@ class HBM_Framework_Cognito extends HBM_Auth_Framework
 
    public function exchange_code_for_tokens($code, $application)
    {
-      $test_server = $this->settings->get_raw_data_field('test_server');
+      $test_server = $this->settings->fuse('test_server');
       if ($test_server) {
-         $sso_server = $this->settings->get_raw_data_field('test_domain');
+         $sso_server = $this->settings->fuse('test_domain');
       } else {
          $sso_server = \home_url() . '/';
       }

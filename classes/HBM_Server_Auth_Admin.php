@@ -21,7 +21,7 @@ class HBM_Server_Auth_Admin extends HBM_Class_Handler
         add_filter('all_plugins', array($this, 'hbm_modify_plugin_data'), 10, 1);
     }
 
-    protected static function set_pattern(): array
+    protected static function set_pattern($options = []): array
     {
         return [
             'pattern' => 'singleton',

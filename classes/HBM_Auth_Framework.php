@@ -2,18 +2,25 @@
 
 namespace HBM\auth_server;
 
+use HBM\Instantiations\HBM_Class_Handler;
+
 // require_once HBM_PLUGIN_PATH . 'api/framework-aws-cognito/class-cognito.php';
 
-abstract class HBM_Auth_Framework
+abstract class HBM_Auth_Framework extends HBM_Class_Handler
 {
+    protected $settings;
 
-    private static $instances = [];
-
-    public static function get_instance($framework = '')
+    final public function __construct()
     {
-        $class = get_called_class(); // Default to the called class
-
-        // If a framework is specified, determine the appropriate child class
+        $this->add_to_dna([$this, 'init_pofs']);
+    }
+    public function init_pofs()
+    {
+        $this->settings = $this->pof('settings');
+    }
+    protected static function set_pattern($options = []): array
+    {
+        $framework = $options['framework'] ?? '';
         if ($framework) {
             switch ($framework) {
                 case 'cognito':
@@ -22,22 +29,13 @@ abstract class HBM_Auth_Framework
                     // Add more cases for other frameworks as needed
             }
         }
-
-        if (!isset(self::$instances[$class])) {
-            self::$instances[$class] = new $class();
-        }
-
-        return self::$instances[$class];
-    }
-
-    protected function __construct()
-    {
-    }
-    private function __clone()
-    {
-    }
-    final public function __wakeup()
-    {
+        return [
+            'pattern' => 'singleton',
+            'class' => $class,
+            '__inject' => [
+                'WPSettings:hbmAuthServerSettings?settings',
+            ]
+        ];
     }
 
     final public function get_framework_context()
@@ -48,7 +46,7 @@ abstract class HBM_Auth_Framework
         $requiredKeys = ['name', 'label', 'auth_id_name'];
         foreach ($requiredKeys as $key) {
             if (!array_key_exists($key, $context)) {
-                throw new Exception("Key {$key} is missing in the context.");
+                throw new \Exception("Key {$key} is missing in the context.");
             }
         }
 

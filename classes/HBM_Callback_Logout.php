@@ -2,12 +2,12 @@
 
 namespace HBM\auth_server;
 
+use HBM\Data_Handlers\Data_Middleware\Data_JWT_Transformation;
 use HBM\Instantiations\HBM_Class_Handler;
 use HBM\Plugin_Management\HBM_Plugin_Utils;
 use HBM\Data_Handlers\HBM_JWT_Helpers;
-use HBM\Helpers\WP_Rest_Modal;
-
-
+use HBM\helpers\WP_Rest_Modal;
+use HBM\Loader\Browser\Transients;
 
 /**
  * Summary of class-hbm-callback-api
@@ -20,22 +20,13 @@ use HBM\Helpers\WP_Rest_Modal;
 
 class HBM_Callback_Logout extends HBM_Class_Handler
 {
-
-    use \HBM\Cookies_And_Sessions\HBM_Session {
-        browser_transient as private;
-        user_session as private;
-    }
-
-    use HBM_JWT_Helpers {
-        hbm_extract_payload as private;
-    }
     use WP_Rest_Modal {
         hbm_set_headers as private;
         hbm_echo_modal as private;
     }
 
     private $plugin_utils;
-    private $transient;
+    private $user_transient;
     private $sso_user_session;
     /**
      * Summary of _deprecated_constructor
@@ -44,18 +35,28 @@ class HBM_Callback_Logout extends HBM_Class_Handler
 
     public function __construct()
     {
+        $this->add_to_dna([$this, 'init_pofs']);
+    }
+
+    public function init_pofs()
+    {
         $this->plugin_utils = HBM_Plugin_Utils::HBM()::get_instance();
-        $this->transient = $this->browser_transient();
-        $this->sso_user_session = $this->user_session();
+        $this->sso_user_session = $this->pof('users');
+        $this->user_transient = $this->pof('transient');
         add_action('rest_api_init', array($this, 'hbm_register_endpoint'));
     }
 
-    protected static function set_pattern(): array
+
+    protected static function set_pattern($options = []): array
     {
         return [
             'pattern' => 'singleton',
             '__ticket' =>
             ['Entry' => ['is_api', ['check_api_namespace', 'hbm-auth-server'], ['check_api_endpoint', 'framework_logout']]],
+            '__inject' => [
+                'transientAttribute:user?transient',
+                'transientCodedFields:ssoUser?users'
+            ]
         ];
     }
 
@@ -87,16 +88,15 @@ class HBM_Callback_Logout extends HBM_Class_Handler
         if (!isset($application)) {
             return new \WP_Error('no_app', 'No application on logout', array('status' => 400));
         }
-        $this->sso_user_session->set_application($application);
-        $state = $this->transient->get('sso_logout');
-        if (!isset($state)) {
+        $state = $this->user_transient->get('sso_logout', false);
+        if (!$state) {
             return new \WP_Error('no_state', 'No state received', array('status' => 400));
         }
-        $state_payload = $this->hbm_extract_payload($state);
+        $state_payload = Data_JWT_Transformation::spayload($state)['data'];
         $mode = $state_payload['mode'];
         $logout_url = "{$state_payload['domain']}wp-json/hbm-auth-client/v1/logout-client?state={$state}";
-        $this->sso_user_session->logout_sso_user();
-        $this->transient->delete('sso_logout');
+        $this->user_transient->del('sso_logout');
+        $this->sso_user_session->fdelall($application);
         if ($mode == 'test') {
             $message = "<h3>You are BACK on the SSO Server</h3>"
                 . "<p>Logout request received: </p><pre>" . json_encode($state_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "</pre>";
